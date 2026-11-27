@@ -65,7 +65,7 @@ npm run dev
 
 # Frontend (en otra terminal)
 cd Sistema_de_Gestion_de_Ventas/tecnifix-frontend
-cp .env.example .env
+cp .env.example .env.local
 npm install
 npm run dev
 ```
