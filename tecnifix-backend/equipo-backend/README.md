@@ -8,8 +8,7 @@ tokens ni datos personales: todo el que tenga acceso al repositorio puede leerlo
 Detalle completo en [para-j-ortiz/README.md](para-j-ortiz/README.md).
 
 Se modificaron archivos del módulo de inventario. **Antes de seguir, ejecuta**
-`git pull origin main`, `npm install` y carga `src/database/tecnifix_local.sql` en una
-base vacía (ver `../README.md`).
+`git pull origin main`, `npm install` y `npm run db:setup`.
 
 | Archivo | Qué se hizo |
 |---|---|
@@ -28,8 +27,8 @@ y antes de cada push.
 
 ## Inventario: últimos cambios
 
-Cada integrante trabaja con su base en su entorno local, y todos la crean con el mismo
-script, `src/database/tecnifix_local.sql`, sin ejecutar migraciones (ver `../README.md`).
+Cada integrante de backend trabaja con su base en su entorno local, y todos la crean
+con las mismas migraciones: `npm run db:setup` aplica `002_modelo_tecnifix.sql`.
 Estas son las tablas que usan los módulos de inventario.
 
 | Módulo | Rutas | Estado |
@@ -55,8 +54,7 @@ Estas son las tablas que usan los módulos de inventario.
 
 Qué cambia para el resto:
 - En `productos`, `precio` pasa a `precio_venta`; la API ya no usa `descripcion` (la
-  columna se conserva). Con las tablas antiguas, `/productos` falla: carga el script en
-  una base vacía.
+  columna se conserva). Con solo `001_init.sql`, `/productos` falla: aplica la `002`.
 - Productos exige sesión y los listados devuelven `{ data, total, pagina, limite }`.
 - `DELETE /productos/:id` desactiva el producto, no lo borra.
 - Las pruebas de integración de productos y compras necesitan esas tablas.
@@ -99,23 +97,24 @@ cantidad lleva signo: positiva si el stock sube y negativa si baja.
 
 ## 1. Ponerlo a funcionar
 
-Requisitos: Node 22, PostgreSQL 17 (o Docker Desktop) y Git. Primero carga el script de
-la base local (ver `../README.md`) y luego, desde `tecnifix-backend/`:
+Requisitos: Node 22, PostgreSQL 17 (o Docker Desktop) y Git. Desde `tecnifix-backend/`:
 
 ```powershell
 npm install
 npm run env:init      # crea .env; luego escribe tu DB_PASSWORD
+npm run db:setup      # crea la base, migra y carga datos de prueba
 npm run dev           # http://localhost:4000
 ```
 
-Cada computadora usa su propia base local. El `.env` no se sube.
+Cada computadora usa su propia base local. El `.env` no se sube. Si ya tenías tablas
+creadas antes, cambia `DB_NAME` en tu `.env` y vuelve a ejecutar `npm run db:setup`.
 
 **Comprobar que funciona:**
 
 | Comando o dirección | Resultado esperado |
 |---|---|
 | `npm run db:check` | `Conexión correcta` |
-| http://localhost:4000/productos | Lista de productos de prueba |
+| `GET /productos` con sesión (Bruno) | Lista paginada de productos de prueba |
 | `npm test` | Pruebas en verde |
 | Colección de `../bruno/` | Cada petición con su estado esperado |
 
@@ -150,8 +149,7 @@ Nombres: `modulo.capa.js` (ej. `ventas.service.js`).
 Está terminada cuando valida los datos, comprueba el rol, responde con el formato
 acordado, tiene pruebas y está documentada.
 
-Un cambio en la base se acuerda con el grupo y se refleja en
-`src/database/tecnifix_local.sql`.
+Un cambio en la base es una migración nueva (`003_...sql` en adelante); no se edita una ya subida.
 Los commits siguen la forma `tipo(backend): resumen`, con viñetas que expliquen los cambios.
 
 ## 4. Formato de respuestas
@@ -189,11 +187,11 @@ En este orden, porque cada uno se apoya en el anterior:
 
 | Paso | Qué hacer | Listo cuando |
 |---|---|---|
-| 1 | Escribir el contrato en `docs/API.md` | Backend y frontend lo aprueban |
-| 2 | ~~Migración `002` según `docs/modelo-er.png`~~ (hecha) | El script `tecnifix_local.sql` crea las 11 tablas |
-| 3 | Un usuario de prueba por rol y adaptar productos (`precio` → `precio_venta`) | Pruebas y Bruno en verde |
+| 1 | Escribir el contrato en `docs/API.md`. Hecho: inventario y permisos. Falta: auth, clientes, ventas y pagos | Backend y frontend lo aprueban |
+| 2 | ~~Migración `002` según `docs/modelo-er.png`~~ (hecha) | `npm run db:setup` crea las 11 tablas |
+| 3 | ~~Un usuario de prueba por rol y adaptar productos (`precio` → `precio_venta`)~~ (hecho) | Pruebas y Bruno en verde |
 | 4 | ~~`verificarRol`~~ (hecho). Falta: usuarios solo para admin y quitar `/auth/register` | Sin permiso responde 403 |
-| 5 | Errores 404/409, validación con `zod` y paginación | Todas las rutas usan el formato |
+| 5 | Errores 404/409, validación con `zod` y paginación. Hecho en inventario | Todas las rutas usan el formato |
 | 6 | ~~Categorías, proveedores y productos completos~~ (hecho) | Se registran desde la API |
 | 7 | ~~Compras, ajustes y kardex, en transacción~~ (hecho) | Una compra sube el stock |
 | 8 | Clientes con DNI o RUC e historial | Se puede buscar por documento |
@@ -201,16 +199,23 @@ En este orden, porque cada uno se apoya en el anterior:
 | 10 | Anulación y reportes | El stock vuelve y los reportes la ignoran |
 | 11 | Bloqueo tras 5 intentos y límite de peticiones | Probado en `tests/` |
 
-## 7. Puntos por confirmar con frontend
+## 7. Acuerdos y pedidos de frontend
 
-Salen de `docs/frontend-vistas.md`. Son **propuestas**, todavía sin acordar.
+Estado al 27/11/2026 de [`docs/pendientes-backend.md`](../../docs/pendientes-backend.md).
 
-| Tema | Propuesta |
+| Tema | Estado |
 |---|---|
-| Orden de `/pagos/simular` y `/ventas` | `/pagos/simular` solo aprueba o rechaza. `POST /ventas` recibe `metodo_pago` y guarda venta y pago juntos |
-| Motivo del ajuste de stock | Columna `motivo` en `movimientos_inventario` (no está en el modelo) |
-| Referencia del kardex | Guardar tipo y número del documento |
-| Login con clave incorrecta | Responder 401 (hoy 400) |
+| 11 tablas, paginación y contrato de inventario | Hecho |
+| Motivo del ajuste de stock y referencia del kardex | Hecho: columnas `motivo` y `referencia` |
+| Permisos por rol | Hecho |
+| Orden de la caja | Acordado: `/pagos/simular` solo aprueba o rechaza y `POST /ventas` guarda venta y pago. Falta programarlo y documentarlo |
+| Contrato de auth, clientes, ventas y pagos | Pendiente |
+| Login con clave incorrecta → 401 | Pendiente (hoy 400) |
+| Rutas de usuarios, dashboard y reportes | Pendiente |
+| Errores inesperados → 500 | Pendiente |
+| CORS con la URL de Vercel | Pendiente: variable `CORS_ORIGIN` al desplegar |
+| Catálogo público para la tienda y columnas nuevas | Por conversar |
+| Reservas de la tienda | Por decidir |
 
 ## 8. Recomendaciones para un mejor funcionamiento
 
