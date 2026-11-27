@@ -1,0 +1,1591 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Plan técnico de TecniFix. Ábrelo en el navegador. -->
+<title>TecniFix · Plan técnico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: una columna de lectura (planos de taller) con diagramas anchos que hacen scroll propio en móvil */
+:root {
+  --bg: #f2f4f5;
+  --surface: #ffffff;
+  --ink: #15212b;
+  --muted: #586572;
+  --line: #d3dbe1;
+  --accent: #c8561a;
+  --accent-soft: #fbe6d8;
+  --front-fill: #e7eef8; --front-stroke: #3c6cb0;
+  --back-fill: #e2f1ee;  --back-stroke: #2a786c;
+  --db-fill: #efe9f6;    --db-stroke: #6a4f9e;
+  --ok: #2f7d4f; --warn: #a86a00; --bad: #b3352b;
+  --f-display: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10171d; --surface: #17212a; --ink: #e5ecf1; --muted: #9babb7; --line: #2a3843;
+    --accent: #f08c4c; --accent-soft: #3a2316;
+    --front-fill: #172a42; --front-stroke: #74a0e2;
+    --back-fill: #142f2b;  --back-stroke: #5fb6a8;
+    --db-fill: #241c33;    --db-stroke: #a98bdb;
+    --ok: #5cc08a; --warn: #e0a640; --bad: #f07b70;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10171d; --surface: #17212a; --ink: #e5ecf1; --muted: #9babb7; --line: #2a3843;
+  --accent: #f08c4c; --accent-soft: #3a2316;
+  --front-fill: #172a42; --front-stroke: #74a0e2;
+  --back-fill: #142f2b;  --back-stroke: #5fb6a8;
+  --db-fill: #241c33;    --db-stroke: #a98bdb;
+  --ok: #5cc08a; --warn: #e0a640; --bad: #f07b70;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 400 16px/1.6 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 56px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 1.65rem; font-weight: 700; }
+h3 { font-size: 1.1rem; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+code, .mono { font-family: var(--f-mono); font-size: 0.88em; }
+a { color: var(--accent); }
+.eyebrow { font: 500 0.78rem/1 var(--f-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.lead { font-size: 1.12rem; color: var(--muted); }
+section { display: grid; gap: 20px; min-width: 0; }
+.section-head { display: grid; gap: 8px; }
+
+/* Cabecera */
+.hero { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 40px; align-items: center; padding-top: 48px; }
+.hero-text { display: grid; gap: 16px; }
+.team { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.team span { font-size: 0.85rem; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
+
+/* Ticket de ejemplo: una orden de servicio real del taller */
+.ticket { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; font-family: var(--f-mono); font-size: 0.86rem; position: relative; }
+.ticket::before, .ticket::after { content: ""; position: absolute; top: 58px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); border: 1px solid var(--line); }
+.ticket::before { left: -10px; } .ticket::after { right: -10px; }
+.ticket-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px dashed var(--line); gap: 12px; }
+.ticket-head strong { font-family: var(--f-display); font-size: 1.15rem; letter-spacing: 0.02em; }
+.tag-ex { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.ticket dl { margin: 0; padding: 16px 20px; display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; }
+.ticket dt { color: var(--muted); }
+.ticket dd { margin: 0; }
+.state { display: inline-block; padding: 1px 8px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+
+/* Problema / solución */
+.ps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.ps article { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: grid; gap: 10px; align-content: start; }
+.ps ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.ps article.sol { border-color: var(--accent); }
+
+/* Tablas */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 0.78rem/1.3 var(--f-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.c { text-align: center; }
+.yes { color: var(--ok); font-weight: 600; }
+.no { color: var(--muted); }
+.part { color: var(--warn); font-weight: 600; }
+.matrix td:first-child { min-width: 240px; }
+.team-table td { min-width: 150px; }
+.team-table td:first-child { min-width: 120px; font-weight: 600; }
+.team-table .who small { display: block; font-weight: 400; color: var(--muted); }
+ul.tight { margin: 0; padding-left: 16px; display: grid; gap: 2px; }
+
+/* Ciclo de la orden */
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.flow .st { font: 500 0.88rem/1 var(--f-mono); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); }
+.flow .st.main { border-color: var(--accent); }
+.flow .arrow { color: var(--muted); }
+.branches { display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.92rem; color: var(--muted); }
+.branches span b { color: var(--bad); font-family: var(--f-mono); font-weight: 500; }
+
+/* Diagramas */
+.diagram { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.diagram svg { display: block; min-width: 900px; width: 100%; height: auto; }
+.cap { font-size: 0.9rem; color: var(--muted); }
+svg text { font-family: var(--f-body); }
+svg .t { fill: var(--ink); font-size: 13px; }
+svg .tb { fill: var(--ink); font-size: 14px; font-weight: 600; }
+svg .th { fill: var(--ink); font-family: var(--f-display); font-size: 16px; font-weight: 700; }
+svg .tm { fill: var(--muted); font-size: 11.5px; }
+svg .mono { fill: var(--ink); font-family: var(--f-mono); font-size: 12px; }
+svg .monom { fill: var(--muted); font-family: var(--f-mono); font-size: 11px; }
+svg .lbl { fill: var(--accent); font-family: var(--f-mono); font-size: 11px; }
+svg .box { fill: var(--bg); stroke: var(--line); stroke-width: 1.2; }
+svg .chip { fill: var(--surface); stroke: var(--line); }
+svg .front { fill: var(--front-fill); stroke: var(--front-stroke); stroke-width: 1.5; }
+svg .back { fill: var(--back-fill); stroke: var(--back-stroke); stroke-width: 1.5; }
+svg .db { fill: var(--db-fill); stroke: var(--db-stroke); stroke-width: 1.5; }
+svg .inner { fill: var(--surface); stroke: var(--line); }
+svg .dash { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 5 4; }
+svg .dashbox { fill: var(--surface); stroke: var(--muted); stroke-dasharray: 5 4; }
+svg .arr { fill: none; stroke: var(--accent); stroke-width: 1.8; }
+svg .arrm { fill: none; stroke: var(--muted); stroke-width: 1.4; }
+svg .head { fill: var(--accent); }
+svg .headm { fill: var(--muted); }
+svg .tbl { fill: var(--surface); stroke: var(--line); stroke-width: 1.2; }
+svg .tblh { fill: var(--accent-soft); stroke: var(--line); stroke-width: 1.2; }
+svg .tbln { fill: var(--accent); font-family: var(--f-mono); font-size: 13px; font-weight: 500; }
+svg .rel { fill: none; stroke: var(--accent); stroke-width: 1.5; }
+svg .card { fill: var(--accent); font-family: var(--f-mono); font-size: 11px; font-weight: 500; }
+
+/* Pasos numerados (son secuencias reales) */
+ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 10px; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; align-items: start; }
+ol.steps li::before { content: counter(s); font: 600 0.85rem/32px var(--f-mono); text-align: center; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--accent); color: var(--accent); }
+ol.steps li div { min-width: 0; padding-top: 4px; }
+ol.steps .where { font: 500 0.75rem/1 var(--f-mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-right: 6px; }
+
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.panel ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.callout { border-left: 3px solid var(--accent); padding: 14px 18px; background: var(--surface); border-radius: 0 8px 8px 0; display: grid; gap: 6px; }
+.callout p { max-width: none; }
+
+.phase { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.phase article { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; gap: 8px; align-content: start; }
+.phase .k { font: 500 0.75rem/1 var(--f-mono); color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; }
+.phase ul { margin: 0; padding-left: 16px; display: grid; gap: 4px; font-size: 0.92rem; }
+
+.checklist td:nth-child(1) { font: 600 0.85rem var(--f-mono); color: var(--accent); white-space: nowrap; }
+
+/* Equipos por capa */
+.team span { display: inline-flex; gap: 8px; align-items: baseline; }
+.team span b { font: 600 0.72rem/1 var(--f-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+.team .t-back b { color: var(--back-stroke); }
+.team .t-front b { color: var(--front-stroke); }
+.teams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.team-card { border-radius: 8px; padding: 20px; display: grid; gap: 14px; align-content: start; border: 1.5px solid; min-width: 0; }
+.back-card { background: var(--back-fill); border-color: var(--back-stroke); }
+.front-card { background: var(--front-fill); border-color: var(--front-stroke); }
+.team-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.team-top code { font-size: 0.95rem; }
+.members { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.members li { display: grid; gap: 2px; padding: 10px 12px; background: var(--surface); border-radius: 6px; }
+.members span { font-size: 0.9rem; color: var(--muted); }
+.deploy { font-size: 0.92rem; }
+.layer-title { display: flex; gap: 8px; align-items: baseline; padding-left: 12px; border-left: 4px solid; }
+.back-title { border-color: var(--back-stroke); }
+.front-title { border-color: var(--front-stroke); }
+.layer-title + .table-wrap { margin-top: -8px; }
+.tree { border-radius: 8px; overflow-x: auto; border: 1.5px solid; min-width: 0; }
+.back-tree { background: var(--back-fill); border-color: var(--back-stroke); }
+.front-tree { background: var(--front-fill); border-color: var(--front-stroke); }
+.tree pre { margin: 0; padding: 16px 18px; font: 400 0.82rem/1.65 var(--f-mono); color: var(--ink); }
+.tree .d { font-weight: 600; }
+.tree .o { color: var(--accent); }
+.rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.rules article { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.rules h3 { font-size: 1rem; }
+.rules p { font-size: 0.94rem; }
+.code-block { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.code-head { font: 500 0.82rem/1.4 var(--f-mono); padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--bg); display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between; }
+.code-head span { color: var(--muted); font-family: var(--f-body); }
+.code-block pre { margin: 0; padding: 14px 16px; overflow-x: auto; font: 400 0.85rem/1.7 var(--f-mono); }
+.api td:nth-child(1) { font: 500 0.8rem var(--f-mono); color: var(--accent); white-space: nowrap; }
+.api td:nth-child(2) { min-width: 220px; }
+.weeks td:nth-child(1) { font: 600 0.9rem var(--f-mono); color: var(--accent); text-align: center; }
+@media (max-width: 860px) {
+  .teams, .rules { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Trabajo con IA */
+h3.sub { font-size: 1.15rem; margin-top: 8px; }
+.prompts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.prompt-card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; min-width: 0; display: grid; grid-template-rows: auto 1fr; }
+.prompt-card.back-p { border-top: 3px solid var(--back-stroke); }
+.prompt-card.front-p { border-top: 3px solid var(--front-stroke); }
+.prompt-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--bg); font-weight: 600; }
+.prompt-head > span:first-child { flex: 1; min-width: 0; }
+.cap-tag { font: 500 0.72rem/1 var(--f-mono); text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 8px; border-radius: 4px; }
+.cap-tag.backend { color: var(--back-stroke); background: var(--back-fill); }
+.cap-tag.frontend { color: var(--front-stroke); background: var(--front-fill); }
+.prompt-card pre { margin: 0; padding: 14px; font: 400 0.8rem/1.6 var(--f-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.prompt-card.agents pre { max-height: 520px; overflow: auto; }
+button.copy { font: 500 0.8rem/1 var(--f-body); padding: 7px 12px; border-radius: 6px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; }
+button.copy:hover { background: var(--accent-soft); }
+@media (max-width: 860px) { .prompts { grid-template-columns: minmax(0, 1fr); } }
+
+.team .t-pair b { color: var(--accent); }
+.callout.pair ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+ol.mini { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 0.94rem; }
+#discord-yml { max-height: 460px; overflow: auto; }
+p code, li code, td code, dd code { overflow-wrap: anywhere; }
+footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--line); padding-top: 20px; }
+
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (max-width: 860px) {
+  .hero, .ps, .two { grid-template-columns: minmax(0, 1fr); }
+  .phase { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero { padding-top: 32px; }
+}
+@media (max-width: 520px) {
+  .phase { grid-template-columns: minmax(0, 1fr); }
+  .ticket dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .ticket dt { margin-top: 6px; }
+}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="hero-text">
+      <span class="eyebrow">Proyecto final · DAWA · Tecsup 2026-2</span>
+      <h1>TecniFix</h1>
+      <p class="lead">Sistema de gestión de ventas e inventario para una tienda de repuestos y accesorios de celulares y computadoras: productos, clientes, ventas y reportes.</p>
+      <div class="team" aria-label="Integrantes por equipo">
+        <span class="t-back"><b>Backend</b> Rony · Jerónimo</span>
+        <span class="t-front"><b>Frontend</b> Oscar · Gabriel</span>
+        <span class="t-pair"><b>Ventas, en las dos capas</b> Jacqueline · Chinchaiguara</span>
+      </div>
+    </div>
+    <aside class="ticket" aria-label="Ejemplo de boleta de venta">
+      <div class="ticket-head">
+        <strong>B001-000142</strong>
+        <span class="tag-ex">Ejemplo de boleta</span>
+      </div>
+      <dl>
+        <dt>Cliente</dt><dd>DNI 72814563</dd>
+        <dt>1 ×</dt><dd>Cargador USB-C 65 W · S/ 89.00</dd>
+        <dt>2 ×</dt><dd>Mica templada iPhone 13 · S/ 30.00</dd>
+        <dt>Op. gravada</dt><dd>S/ 100.85</dd>
+        <dt>IGV 18 %</dt><dd>S/ 18.15</dd>
+        <dt>Total</dt><dd><span class="state">S/ 119.00</span></dd>
+        <dt>Pago</dt><dd>Yape (simulado) · vendedor: caja 1</dd>
+      </dl>
+    </aside>
+  </header>
+
+  <section aria-labelledby="s-problema">
+    <div class="section-head">
+      <span class="eyebrow">Por qué existe</span>
+      <h2 id="s-problema">Problema, solución y a quién va dirigido</h2>
+      <p>Corresponde a la idea <b>a. Sistema de gestión de ventas o inventario</b> del enunciado, con sus cuatro módulos: productos, clientes, ventas y reportes.</p>
+    </div>
+    <div class="ps">
+      <article>
+        <h3>Problema</h3>
+        <ul>
+          <li>La tienda lleva el stock en un cuaderno o en Excel, y se vende algo que ya no hay.</li>
+          <li>No se sabe qué productos se venden más ni cuánto se ganó en el mes.</li>
+          <li>El precio cambia según quién atienda.</li>
+          <li>Las compras a proveedores y las ventas no quedan registradas, así que no se puede saber por qué falta mercadería.</li>
+        </ul>
+      </article>
+      <article class="sol">
+        <h3>Solución</h3>
+        <ul>
+          <li><b>Productos</b> con categoría, precio y stock, y aviso cuando llegan al stock mínimo.</li>
+          <li><b>Ventas</b> en caja que descuentan el stock solas y emiten boleta o factura con IGV.</li>
+          <li><b>Kardex</b>: cada entrada y salida de mercadería queda registrada.</li>
+          <li><b>Clientes</b> con su historial de compras, y <b>reportes</b> con gráficos.</li>
+        </ul>
+      </article>
+      <article>
+        <h3>Dirigido a</h3>
+        <ul>
+          <li><b>Dueños de tiendas pequeñas</b> de repuestos y accesorios de tecnología.</li>
+          <li><b>Su personal</b>: vendedores en caja y la persona que recibe la mercadería.</li>
+          <li>Es un sistema interno: los clientes de la tienda no entran al sistema.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-roles">
+    <div class="section-head">
+      <span class="eyebrow">Usuarios y permisos</span>
+      <h2 id="s-roles">Roles del sistema</h2>
+      <p>Tres roles, todos con inicio de sesión (JWT). Cada ruta del backend comprueba el rol antes de ejecutar nada, y el frontend oculta lo que el rol no puede usar.</p>
+    </div>
+    <div class="table-wrap">
+      <table class="matrix">
+        <thead><tr><th>Acción</th><th>Administrador</th><th>Vendedor</th><th>Almacenero</th></tr></thead>
+        <tbody>
+          <tr><td>Crear usuarios y asignar roles</td><td class="c yes">Sí</td><td class="c no">—</td><td class="c no">—</td></tr>
+          <tr><td>Crear y editar productos</td><td class="c yes">Sí</td><td class="c no">—</td><td class="c part">Sí, sin cambiar precios</td></tr>
+          <tr><td>Cambiar precios de venta</td><td class="c yes">Sí</td><td class="c no">—</td><td class="c no">—</td></tr>
+          <tr><td>Gestionar categorías y proveedores</td><td class="c yes">Sí</td><td class="c no">—</td><td class="c yes">Sí</td></tr>
+          <tr><td>Registrar compras a proveedores (entrada de stock)</td><td class="c yes">Sí</td><td class="c no">—</td><td class="c yes">Sí</td></tr>
+          <tr><td>Ajustar stock (pérdida, conteo físico)</td><td class="c yes">Sí</td><td class="c no">—</td><td class="c no">—</td></tr>
+          <tr><td>Ver productos, stock y alertas</td><td class="c yes">Sí</td><td class="c yes">Sí</td><td class="c yes">Sí</td></tr>
+          <tr><td>Registrar clientes</td><td class="c yes">Sí</td><td class="c yes">Sí</td><td class="c no">—</td></tr>
+          <tr><td>Registrar ventas y cobrar (pago simulado)</td><td class="c yes">Sí</td><td class="c yes">Sí</td><td class="c no">—</td></tr>
+          <tr><td>Anular una venta (devuelve el stock)</td><td class="c yes">Sí</td><td class="c no">—</td><td class="c no">—</td></tr>
+          <tr><td>Ver dashboard y reportes</td><td class="c yes">Todos</td><td class="c part">Sus ventas del día</td><td class="c part">Stock y kardex</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-flujo">
+    <div class="section-head">
+      <span class="eyebrow">Flujo principal del negocio</span>
+      <h2 id="s-flujo">De la compra al proveedor al reporte</h2>
+      <p>Este es el flujo que se demuestra en vivo. Cada paso que mueve mercadería deja una fila en <code>movimientos_inventario</code> (el kardex).</p>
+    </div>
+    <div class="flow" role="list">
+      <span class="st main" role="listitem">COMPRA A PROVEEDOR</span><span class="arrow" aria-hidden="true">→</span>
+      <span class="st" role="listitem">ENTRADA DE STOCK</span><span class="arrow" aria-hidden="true">→</span>
+      <span class="st" role="listitem">VENTA EN CAJA</span><span class="arrow" aria-hidden="true">→</span>
+      <span class="st" role="listitem">COBRO</span><span class="arrow" aria-hidden="true">→</span>
+      <span class="st" role="listitem">BOLETA O FACTURA</span><span class="arrow" aria-hidden="true">→</span>
+      <span class="st" role="listitem">SALIDA DE STOCK</span><span class="arrow" aria-hidden="true">→</span>
+      <span class="st main" role="listitem">REPORTES</span>
+    </div>
+    <div class="branches">
+      <span>Si no hay stock suficiente, la venta <b>NO SE REGISTRA</b> y se avisa qué producto falta.</span>
+      <span>Si el administrador <b>ANULA</b> una venta, el stock vuelve a subir.</span>
+      <span>Si un producto queda en su stock mínimo, aparece en <b>ALERTAS</b>.</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-arq">
+    <div class="section-head">
+      <span class="eyebrow">Diseño técnico</span>
+      <h2 id="s-arq">Arquitectura cliente-servidor</h2>
+      <p>Tres piezas separadas que se comunican por HTTP: el frontend en Next.js, la API REST en Express y la base de datos PostgreSQL. Es la misma estructura que ya tiene el repositorio de Rony.</p>
+    </div>
+    <div class="diagram" id="arq">
+      <svg viewBox="0 44 1120 536" role="img" aria-label="Diagrama de arquitectura: usuarios, frontend Next.js en Vercel, backend Express en Render y PostgreSQL en Supabase, con entrega continua desde GitHub">
+        <defs>
+          <marker id="ha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="head"/></marker>
+          <marker id="hm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="headm"/></marker>
+        </defs>
+
+        <rect x="20" y="60" width="170" height="380" rx="10" class="box"/>
+        <text x="36" y="88" class="th">Usuarios</text>
+        <rect x="34" y="104" width="142" height="90" rx="8" class="chip"/>
+        <text x="46" y="134" class="tb">Administrador</text>
+        <text x="46" y="156" class="tm">usuarios, precios</text>
+        <text x="46" y="172" class="tm">y reportes</text>
+        <rect x="34" y="214" width="142" height="90" rx="8" class="chip"/>
+        <text x="46" y="244" class="tb">Vendedor</text>
+        <text x="46" y="266" class="tm">clientes, caja</text>
+        <text x="46" y="282" class="tm">y cobros</text>
+        <rect x="34" y="324" width="142" height="90" rx="8" class="chip"/>
+        <text x="46" y="354" class="tb">Almacenero</text>
+        <text x="46" y="376" class="tm">compras, stock</text>
+        <text x="46" y="392" class="tm">y kardex</text>
+        <line x1="176" y1="149" x2="218" y2="149" class="arrm" marker-end="url(#hm)"/>
+        <line x1="176" y1="259" x2="218" y2="259" class="arrm" marker-end="url(#hm)"/>
+        <line x1="176" y1="369" x2="218" y2="369" class="arrm" marker-end="url(#hm)"/>
+
+        <rect x="220" y="60" width="290" height="380" rx="10" class="front"/>
+        <text x="236" y="88" class="th">Frontend · Next.js</text>
+        <text x="494" y="88" class="tm" text-anchor="end">Vercel</text>
+        <rect x="236" y="104" width="258" height="118" rx="6" class="inner"/>
+        <text x="248" y="124" class="tb">App Router · páginas por rol</text>
+        <text x="248" y="144" class="mono">/login   /dashboard</text>
+        <text x="248" y="160" class="mono">/productos   /productos/[id]</text>
+        <text x="248" y="176" class="mono">/clientes   /clientes/[id]</text>
+        <text x="248" y="192" class="mono">/ventas/nueva   /ventas/[id]</text>
+        <text x="248" y="208" class="mono">/compras   /reportes</text>
+        <rect x="236" y="232" width="258" height="64" rx="6" class="inner"/>
+        <text x="248" y="256" class="tb">AuthContext + useAuth</text>
+        <text x="248" y="276" class="tm">guarda el JWT y el rol del usuario;</text>
+        <text x="248" y="289" class="tm">oculta menús que su rol no puede usar</text>
+        <rect x="236" y="306" width="258" height="64" rx="6" class="inner"/>
+        <text x="248" y="330" class="tb">services/ + lib/fetcher.js</text>
+        <text x="248" y="350" class="tm">un archivo por módulo; todas las llamadas</text>
+        <text x="248" y="363" class="tm">a la API pasan por un solo fetch con token</text>
+        <rect x="236" y="380" width="258" height="46" rx="6" class="inner"/>
+        <text x="248" y="408" class="monom">.env → NEXT_PUBLIC_API_URL</text>
+
+        <line x1="510" y1="200" x2="598" y2="200" class="arr" marker-end="url(#ha)"/>
+        <text x="555" y="172" class="lbl" text-anchor="middle">HTTPS + JSON</text>
+        <text x="555" y="188" class="lbl" text-anchor="middle">Bearer &lt;JWT&gt;</text>
+        <line x1="598" y1="232" x2="512" y2="232" class="arr" marker-end="url(#ha)"/>
+        <text x="555" y="252" class="lbl" text-anchor="middle">200/401/403</text>
+
+        <rect x="600" y="60" width="300" height="380" rx="10" class="back"/>
+        <text x="616" y="88" class="th">Backend · Express API</text>
+        <text x="884" y="88" class="tm" text-anchor="end">Render</text>
+        <rect x="616" y="104" width="268" height="58" rx="6" class="inner"/>
+        <text x="628" y="124" class="tb">Middlewares</text>
+        <text x="628" y="142" class="monom">cors · rateLimit · verificarToken</text>
+        <text x="628" y="156" class="monom">verificarRol · validar</text>
+        <rect x="616" y="174" width="268" height="40" rx="6" class="inner"/>
+        <text x="628" y="199" class="mono">routes/</text>
+        <text x="870" y="199" class="tm" text-anchor="end">URL → controlador</text>
+        <rect x="616" y="226" width="268" height="40" rx="6" class="inner"/>
+        <text x="628" y="251" class="mono">controllers/</text>
+        <text x="870" y="251" class="tm" text-anchor="end">lee la petición, responde</text>
+        <rect x="616" y="278" width="268" height="40" rx="6" class="inner"/>
+        <text x="628" y="303" class="mono">services/</text>
+        <text x="870" y="303" class="tm" text-anchor="end">reglas: stock, IGV, roles</text>
+        <rect x="616" y="330" width="268" height="40" rx="6" class="inner"/>
+        <text x="628" y="355" class="mono">repositories/</text>
+        <text x="870" y="355" class="tm" text-anchor="end">SQL y transacciones</text>
+        <line x1="750" y1="162" x2="750" y2="173" class="arrm" marker-end="url(#hm)"/>
+        <line x1="750" y1="214" x2="750" y2="225" class="arrm" marker-end="url(#hm)"/>
+        <line x1="750" y1="266" x2="750" y2="277" class="arrm" marker-end="url(#hm)"/>
+        <line x1="750" y1="318" x2="750" y2="329" class="arrm" marker-end="url(#hm)"/>
+        <rect x="616" y="382" width="268" height="46" rx="6" class="inner"/>
+        <text x="628" y="401" class="monom">.env → DATABASE_URL, JWT_SECRET,</text>
+        <text x="628" y="416" class="monom">CORS_ORIGIN, PORT</text>
+
+        <rect x="960" y="60" width="140" height="58" rx="8" class="dashbox"/>
+        <text x="1030" y="84" class="t" text-anchor="middle">Pasarela de pago</text>
+        <text x="1030" y="102" class="tm" text-anchor="middle">simulada (opcional)</text>
+        <path d="M900,118 H930 V90 H958" class="dash"/>
+
+        <path d="M960,150 v262 a70,14 0 0 0 140,0 v-262" class="db"/>
+        <ellipse cx="1030" cy="150" rx="70" ry="14" class="db"/>
+        <text x="1030" y="190" class="th" text-anchor="middle">PostgreSQL</text>
+        <text x="1030" y="208" class="tm" text-anchor="middle">Supabase</text>
+        <text x="1030" y="232" class="monom" text-anchor="middle">usuarios</text>
+        <text x="1030" y="247" class="monom" text-anchor="middle">clientes</text>
+        <text x="1030" y="262" class="monom" text-anchor="middle">categorias</text>
+        <text x="1030" y="277" class="monom" text-anchor="middle">proveedores</text>
+        <text x="1030" y="292" class="monom" text-anchor="middle">productos</text>
+        <text x="1030" y="307" class="monom" text-anchor="middle">compras</text>
+        <text x="1030" y="322" class="monom" text-anchor="middle">compra_detalle</text>
+        <text x="1030" y="337" class="monom" text-anchor="middle">ventas</text>
+        <text x="1030" y="352" class="monom" text-anchor="middle">venta_detalle</text>
+        <text x="1030" y="367" class="monom" text-anchor="middle">movimientos (kardex)</text>
+        <text x="1030" y="382" class="monom" text-anchor="middle">pagos</text>
+        <line x1="884" y1="350" x2="958" y2="350" class="arr" marker-end="url(#ha)"/>
+        <text x="930" y="336" class="lbl" text-anchor="middle">SQL</text>
+        <text x="930" y="368" class="lbl" text-anchor="middle">SSL</text>
+
+        <text x="20" y="484" class="tm" style="letter-spacing:.12em">ENTREGA CONTINUA · DE GITHUB A PRODUCCIÓN</text>
+        <rect x="20" y="498" width="230" height="64" rx="8" class="chip"/>
+        <text x="34" y="524" class="tb">GitHub · un repositorio</text>
+        <text x="34" y="544" class="tm">una carpeta por capa</text>
+        <rect x="290" y="498" width="230" height="64" rx="8" class="chip"/>
+        <text x="304" y="524" class="tb">Commit directo a main</text>
+        <text x="304" y="544" class="tm">pull --rebase antes de subir</text>
+        <rect x="560" y="498" width="230" height="64" rx="8" class="chip"/>
+        <text x="574" y="524" class="tb">GitHub Actions</text>
+        <text x="574" y="544" class="monom">npm test · next build</text>
+        <rect x="830" y="498" width="270" height="64" rx="8" class="chip"/>
+        <text x="844" y="524" class="tb">Despliegue automático</text>
+        <text x="844" y="544" class="tm">main → Vercel (front) y Render (back)</text>
+        <line x1="250" y1="530" x2="288" y2="530" class="arr" marker-end="url(#ha)"/>
+        <line x1="520" y1="530" x2="558" y2="530" class="arr" marker-end="url(#ha)"/>
+        <line x1="790" y1="530" x2="828" y2="530" class="arr" marker-end="url(#ha)"/>
+      </svg>
+    </div>
+    <p class="cap">Es un <b>monolito modular</b>: un solo backend, ordenado por módulos. Así lo planteó Rony en el README, y si el sistema crece, cada módulo puede separarse en su propio servicio.</p>
+  </section>
+
+  <section aria-labelledby="s-peticion">
+    <div class="section-head">
+      <span class="eyebrow">Para la explicación técnica</span>
+      <h2 id="s-peticion">Recorrido de una petición de Next.js a Express</h2>
+      <p>Ejemplo real del flujo: el vendedor registra la venta de la boleta B001-000142.</p>
+    </div>
+    <ol class="steps">
+      <li><div><span class="where">Next.js</span>En <code>/ventas/nueva</code> el vendedor agrega los productos al carrito, elige el cliente y pulsa <b>Cobrar</b>.</div></li>
+      <li><div><span class="where">Next.js</span><code>ventas.service.js</code> llama al <code>fetcher</code>: <code>POST {API}/ventas</code> con el cliente y los productos, y el header <code>Authorization: Bearer &lt;token&gt;</code>.</div></li>
+      <li><div><span class="where">Express</span><code>cors</code> comprueba que la petición venga del dominio del frontend.</div></li>
+      <li><div><span class="where">Express</span><code>verificarToken</code> decodifica el JWT y deja <code>req.usuario = { id: 4, rol: "vendedor" }</code>. Sin token válido responde <b>401</b>.</div></li>
+      <li><div><span class="where">Express</span><code>verificarRol("vendedor", "admin")</code> deja pasar. Si fuera el almacenero, responde <b>403</b>.</div></li>
+      <li><div><span class="where">Express</span><code>validar</code> revisa que haya al menos un producto y que las cantidades sean mayores que cero.</div></li>
+      <li><div><span class="where">Express</span>El servicio calcula subtotal, IGV y total con los precios de la base de datos, no con los que mandó el navegador.</div></li>
+      <li><div><span class="where">PostgreSQL</span>El repositorio abre una transacción: bloquea el stock de cada producto (<code>SELECT ... FOR UPDATE</code>), inserta la venta y su detalle, descuenta el stock y registra la salida en el kardex. Si un producto no alcanza, deshace todo (<code>ROLLBACK</code>) y responde <b>409</b>.</div></li>
+      <li><div><span class="where">Next.js</span>Responde <b>201</b> con la boleta; la pantalla la muestra y el dashboard ya incluye la venta.</div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="s-er">
+    <div class="section-head">
+      <span class="eyebrow">Modelo de datos</span>
+      <h2 id="s-er">Modelo entidad-relación</h2>
+      <p>Once tablas. <code>usuarios</code>, <code>productos</code>, <code>clientes</code>, <code>ventas</code> y <code>venta_detalle</code> ya existen en el repositorio y se amplían; se agregan categorías, proveedores, compras, el kardex y los pagos.</p>
+    </div>
+    <div class="diagram" id="er">
+<svg viewBox="0 0 1120 715" role="img" aria-label="Modelo entidad-relación de TecniFix con once tablas de ventas e inventario">
+<rect x="20" y="20" width="240" height="242" rx="6" class="tbl"/>
+<path d="M20,54 V26 a6,6 0 0 1 6,-6 H254 a6,6 0 0 1 6,6 V54 Z" class="tblh"/>
+<text x="32" y="42" class="tbln">usuarios</text>
+<text x="32" y="70" class="mono">id</text>
+<text x="250" y="70" class="lbl" text-anchor="end">PK</text>
+<text x="32" y="92" class="mono">nombre</text>
+<text x="32" y="114" class="mono">email</text>
+<text x="250" y="114" class="lbl" text-anchor="end">UQ</text>
+<text x="32" y="136" class="mono">password_hash</text>
+<text x="32" y="158" class="mono">rol</text>
+<text x="250" y="158" class="monom" text-anchor="end">admin|vendedor|almacenero</text>
+<text x="32" y="180" class="mono">intentos_fallidos</text>
+<text x="32" y="202" class="mono">bloqueado_hasta</text>
+<text x="32" y="224" class="mono">activo</text>
+<text x="32" y="246" class="mono">creado_en</text>
+<rect x="20" y="300" width="240" height="198" rx="6" class="tbl"/>
+<path d="M20,334 V306 a6,6 0 0 1 6,-6 H254 a6,6 0 0 1 6,6 V334 Z" class="tblh"/>
+<text x="32" y="322" class="tbln">clientes</text>
+<text x="32" y="350" class="mono">id</text>
+<text x="250" y="350" class="lbl" text-anchor="end">PK</text>
+<text x="32" y="372" class="mono">tipo_documento</text>
+<text x="250" y="372" class="monom" text-anchor="end">DNI|RUC</text>
+<text x="32" y="394" class="mono">documento</text>
+<text x="250" y="394" class="lbl" text-anchor="end">UQ</text>
+<text x="32" y="416" class="mono">nombre</text>
+<text x="32" y="438" class="mono">telefono</text>
+<text x="32" y="460" class="mono">email</text>
+<text x="32" y="482" class="mono">direccion</text>
+<rect x="300" y="20" width="240" height="264" rx="6" class="tbl"/>
+<path d="M300,54 V26 a6,6 0 0 1 6,-6 H534 a6,6 0 0 1 6,6 V54 Z" class="tblh"/>
+<text x="312" y="42" class="tbln">ventas</text>
+<text x="312" y="70" class="mono">id</text>
+<text x="530" y="70" class="lbl" text-anchor="end">PK</text>
+<text x="312" y="92" class="mono">serie_numero</text>
+<text x="530" y="92" class="lbl" text-anchor="end">UQ  B001-000142</text>
+<text x="312" y="114" class="mono">cliente_id</text>
+<text x="530" y="114" class="lbl" text-anchor="end">FK → clientes</text>
+<text x="312" y="136" class="mono">vendedor_id</text>
+<text x="530" y="136" class="lbl" text-anchor="end">FK → usuarios</text>
+<text x="312" y="158" class="mono">tipo_comprobante</text>
+<text x="530" y="158" class="monom" text-anchor="end">boleta|factura</text>
+<text x="312" y="180" class="mono">subtotal</text>
+<text x="312" y="202" class="mono">igv</text>
+<text x="530" y="202" class="monom" text-anchor="end">18 %</text>
+<text x="312" y="224" class="mono">total</text>
+<text x="312" y="246" class="mono">estado</text>
+<text x="530" y="246" class="monom" text-anchor="end">pagada|anulada</text>
+<text x="312" y="268" class="mono">fecha</text>
+<rect x="300" y="330" width="240" height="176" rx="6" class="tbl"/>
+<path d="M300,364 V336 a6,6 0 0 1 6,-6 H534 a6,6 0 0 1 6,6 V364 Z" class="tblh"/>
+<text x="312" y="352" class="tbln">pagos</text>
+<text x="312" y="380" class="mono">id</text>
+<text x="530" y="380" class="lbl" text-anchor="end">PK</text>
+<text x="312" y="402" class="mono">venta_id</text>
+<text x="530" y="402" class="lbl" text-anchor="end">FK → ventas</text>
+<text x="312" y="424" class="mono">monto</text>
+<text x="312" y="446" class="mono">metodo</text>
+<text x="530" y="446" class="monom" text-anchor="end">efectivo|tarjeta|yape</text>
+<text x="312" y="468" class="mono">estado</text>
+<text x="312" y="490" class="mono">referencia</text>
+<rect x="300" y="540" width="240" height="132" rx="6" class="tbl"/>
+<path d="M300,574 V546 a6,6 0 0 1 6,-6 H534 a6,6 0 0 1 6,6 V574 Z" class="tblh"/>
+<text x="312" y="562" class="tbln">proveedores</text>
+<text x="312" y="590" class="mono">id</text>
+<text x="530" y="590" class="lbl" text-anchor="end">PK</text>
+<text x="312" y="612" class="mono">ruc</text>
+<text x="530" y="612" class="lbl" text-anchor="end">UQ</text>
+<text x="312" y="634" class="mono">razon_social</text>
+<text x="312" y="656" class="mono">telefono</text>
+<rect x="580" y="20" width="240" height="176" rx="6" class="tbl"/>
+<path d="M580,54 V26 a6,6 0 0 1 6,-6 H814 a6,6 0 0 1 6,6 V54 Z" class="tblh"/>
+<text x="592" y="42" class="tbln">venta_detalle</text>
+<text x="592" y="70" class="mono">id</text>
+<text x="810" y="70" class="lbl" text-anchor="end">PK</text>
+<text x="592" y="92" class="mono">venta_id</text>
+<text x="810" y="92" class="lbl" text-anchor="end">FK → ventas</text>
+<text x="592" y="114" class="mono">producto_id</text>
+<text x="810" y="114" class="lbl" text-anchor="end">FK → productos</text>
+<text x="592" y="136" class="mono">cantidad</text>
+<text x="592" y="158" class="mono">precio_unitario</text>
+<text x="592" y="180" class="mono">subtotal</text>
+<rect x="580" y="230" width="240" height="220" rx="6" class="tbl"/>
+<path d="M580,264 V236 a6,6 0 0 1 6,-6 H814 a6,6 0 0 1 6,6 V264 Z" class="tblh"/>
+<text x="592" y="252" class="tbln">movimientos_inventario</text>
+<text x="592" y="280" class="mono">id</text>
+<text x="810" y="280" class="lbl" text-anchor="end">PK</text>
+<text x="592" y="302" class="mono">producto_id</text>
+<text x="810" y="302" class="lbl" text-anchor="end">FK → productos</text>
+<text x="592" y="324" class="mono">tipo</text>
+<text x="810" y="324" class="monom" text-anchor="end">entrada|salida|ajuste</text>
+<text x="592" y="346" class="mono">cantidad</text>
+<text x="592" y="368" class="mono">stock_resultante</text>
+<text x="592" y="390" class="mono">referencia</text>
+<text x="810" y="390" class="monom" text-anchor="end">venta|compra</text>
+<text x="592" y="412" class="mono">usuario_id</text>
+<text x="810" y="412" class="lbl" text-anchor="end">FK → usuarios</text>
+<text x="592" y="434" class="mono">fecha</text>
+<rect x="580" y="480" width="240" height="154" rx="6" class="tbl"/>
+<path d="M580,514 V486 a6,6 0 0 1 6,-6 H814 a6,6 0 0 1 6,6 V514 Z" class="tblh"/>
+<text x="592" y="502" class="tbln">compras</text>
+<text x="592" y="530" class="mono">id</text>
+<text x="810" y="530" class="lbl" text-anchor="end">PK</text>
+<text x="592" y="552" class="mono">proveedor_id</text>
+<text x="810" y="552" class="lbl" text-anchor="end">FK → proveedores</text>
+<text x="592" y="574" class="mono">usuario_id</text>
+<text x="810" y="574" class="lbl" text-anchor="end">FK → usuarios</text>
+<text x="592" y="596" class="mono">total</text>
+<text x="592" y="618" class="mono">fecha</text>
+<rect x="860" y="20" width="240" height="242" rx="6" class="tbl"/>
+<path d="M860,54 V26 a6,6 0 0 1 6,-6 H1094 a6,6 0 0 1 6,6 V54 Z" class="tblh"/>
+<text x="872" y="42" class="tbln">productos</text>
+<text x="872" y="70" class="mono">id</text>
+<text x="1090" y="70" class="lbl" text-anchor="end">PK</text>
+<text x="872" y="92" class="mono">sku</text>
+<text x="1090" y="92" class="lbl" text-anchor="end">UQ</text>
+<text x="872" y="114" class="mono">nombre</text>
+<text x="872" y="136" class="mono">categoria_id</text>
+<text x="1090" y="136" class="lbl" text-anchor="end">FK → categorias</text>
+<text x="872" y="158" class="mono">precio_compra</text>
+<text x="872" y="180" class="mono">precio_venta</text>
+<text x="872" y="202" class="mono">stock</text>
+<text x="872" y="224" class="mono">stock_minimo</text>
+<text x="872" y="246" class="mono">activo</text>
+<rect x="860" y="300" width="240" height="88" rx="6" class="tbl"/>
+<path d="M860,334 V306 a6,6 0 0 1 6,-6 H1094 a6,6 0 0 1 6,6 V334 Z" class="tblh"/>
+<text x="872" y="322" class="tbln">categorias</text>
+<text x="872" y="350" class="mono">id</text>
+<text x="1090" y="350" class="lbl" text-anchor="end">PK</text>
+<text x="872" y="372" class="mono">nombre</text>
+<text x="1090" y="372" class="lbl" text-anchor="end">UQ</text>
+<rect x="860" y="410" width="240" height="154" rx="6" class="tbl"/>
+<path d="M860,444 V416 a6,6 0 0 1 6,-6 H1094 a6,6 0 0 1 6,6 V444 Z" class="tblh"/>
+<text x="872" y="432" class="tbln">compra_detalle</text>
+<text x="872" y="460" class="mono">id</text>
+<text x="1090" y="460" class="lbl" text-anchor="end">PK</text>
+<text x="872" y="482" class="mono">compra_id</text>
+<text x="1090" y="482" class="lbl" text-anchor="end">FK → compras</text>
+<text x="872" y="504" class="mono">producto_id</text>
+<text x="1090" y="504" class="lbl" text-anchor="end">FK → productos</text>
+<text x="872" y="526" class="mono">cantidad</text>
+<text x="872" y="548" class="mono">costo_unitario</text>
+<path d="M260,100 H298" class="rel"/>
+<text x="264" y="94" class="card">1</text>
+<text x="288" y="94" class="card">N</text>
+<path d="M260,340 H282 V250 H298" class="rel"/>
+<text x="264" y="334" class="card">1</text>
+<text x="288" y="244" class="card">N</text>
+<path d="M540,100 H578" class="rel"/>
+<text x="544" y="94" class="card">1</text>
+<text x="568" y="94" class="card">N</text>
+<path d="M860,150 H822" class="rel"/>
+<text x="850" y="144" class="card">1</text>
+<text x="826" y="144" class="card">N</text>
+<path d="M420,284 V328" class="rel"/>
+<text x="426" y="300" class="card">1</text>
+<text x="426" y="322" class="card">N</text>
+<path d="M860,245 H822" class="rel"/>
+<text x="850" y="239" class="card">1</text>
+<text x="826" y="239" class="card">N</text>
+<path d="M980,298 V264" class="rel"/>
+<text x="986" y="286" class="card">1:N</text>
+<path d="M1100,200 H1112 V480 H1102" class="rel"/>
+<text x="1104" y="194" class="card">1</text>
+<text x="1104" y="474" class="card">N</text>
+<path d="M820,520 H858" class="rel"/>
+<text x="824" y="514" class="card">1</text>
+<text x="848" y="514" class="card">N</text>
+<path d="M540,580 H578" class="rel"/>
+<text x="544" y="574" class="card">1</text>
+<text x="568" y="574" class="card">N</text>
+<text x="20" y="700" class="tm">PK clave primaria · FK clave foránea · UQ valor único · 1 / N: uno a muchos. Cada venta y cada compra dejan filas en movimientos_inventario (el kardex).</text>
+</svg>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-tec">
+    <div class="section-head">
+      <span class="eyebrow">Justificación</span>
+      <h2 id="s-tec">Por qué estas tecnologías</h2>
+    </div>
+    <div class="two">
+      <article class="panel">
+        <h3>Base de datos relacional (PostgreSQL)</h3>
+        <ul>
+          <li>Una venta toca varias tablas a la vez: la venta, su detalle, el stock de cada producto y el kardex. Con una <b>transacción</b> se guarda todo o nada, y nunca queda stock descontado de una venta que falló.</li>
+          <li><code>SELECT ... FOR UPDATE</code> evita que dos cajas vendan la última unidad al mismo tiempo.</li>
+          <li>Las claves foráneas impiden vender un producto o a un cliente que no existe.</li>
+          <li>Los reportes salen con <code>JOIN</code> y <code>GROUP BY</code>: ventas por día, productos más vendidos, ventas por vendedor.</li>
+          <li>Una base NoSQL (MongoDB) conviene cuando los datos no tienen estructura fija. Aquí todo tiene estructura estable y relaciones.</li>
+        </ul>
+      </article>
+      <article class="panel">
+        <h3>Next.js + Express separados</h3>
+        <ul>
+          <li><b>Next.js</b>: páginas por rol con App Router; SSR en listados y reportes, y la caja con interacción en el navegador. Se despliega en Vercel.</li>
+          <li><b>Express</b>: API REST ordenada por capas (rutas, controladores, servicios, repositorios). Se despliega en Render.</li>
+          <li>Separados, el equipo de frontend y el de backend trabajan en paralelo sin tocar el código del otro.</li>
+          <li><b>Supabase</b> da PostgreSQL gestionado y gratuito, con conexión segura por SSL.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-equipo">
+    <div class="section-head">
+      <span class="eyebrow">Organización del grupo</span>
+      <h2 id="s-equipo">Dos equipos por capa</h2>
+      <p>El grupo se divide en <b>backend</b> y <b>frontend</b>. Cada equipo es dueño de su carpeta del repositorio y no toca la del otro. Los dos equipos solo se comunican a través del <b>contrato de la API</b>: qué rutas existen, qué reciben y qué devuelven.</p>
+    </div>
+    <div class="teams">
+      <article class="team-card back-card">
+        <div class="team-top">
+          <h3>Equipo backend</h3>
+          <code>tecnifix-backend/</code>
+        </div>
+        <ul class="members">
+          <li><b>Rony</b><span>Líder del backend · base, usuarios y seguridad</span></li>
+          <li><b>Jerónimo</b><span>Inventario: productos, categorías, proveedores, compras y kardex</span></li>
+          <li><b>Jacqueline y Chinchaiguara</b><span>Pareja de ventas, por turnos: rutas de clientes, ventas, pagos y reportes</span></li>
+        </ul>
+        <p class="deploy">Publica en <b>Render</b> con la base en <b>Supabase</b>.</p>
+      </article>
+      <article class="team-card front-card">
+        <div class="team-top">
+          <h3>Equipo frontend</h3>
+          <code>tecnifix-frontend/</code>
+        </div>
+        <ul class="members">
+          <li><b>Oscar</b><span>Líder del frontend · base, diseño, login y usuarios</span></li>
+          <li><b>Gabriel</b><span>Pantallas de inventario</span></li>
+          <li><b>Jacqueline y Chinchaiguara</b><span>Pareja de ventas, por turnos: clientes, caja, boleta, pagos y dashboard</span></li>
+        </ul>
+        <p class="deploy">Publica en <b>Vercel</b>.</p>
+      </article>
+    </div>
+    <div class="callout pair">
+      <h3>Pareja de ventas: Jacqueline y Chinchaiguara, por turnos</h3>
+      <p>El módulo de <b>clientes, ventas, pagos y reportes</b> es de las dos, en backend y en frontend. Un día una puede estar en backend y la otra en frontend, y al siguiente al revés. Para que eso no cause conflictos:</p>
+      <ul>
+        <li><b>El turno es por tarea.</b> Cada tarjeta del tablero dice si es <code>back</code> o <code>front</code> y tiene una sola responsable.</li>
+        <li><b>Solo cambian de capa al terminar.</b> Cuando su tarea ya está subida a <code>main</code>, nunca a mitad de una tarea.</li>
+        <li><b>Nunca las dos en el mismo archivo a la vez.</b> Si una tiene <code>ventas.service.js</code> del backend, la otra trabaja en otra cosa.</li>
+        <li><b>Avisan en el grupo qué toman</b>, por ejemplo: "tomo back/ventas-anular".</li>
+        <li><b>La que entra a una capa lee antes</b> los últimos commits de su compañera en esa capa.</li>
+        <li><b>Revisión:</b> en backend aprueba Rony o Jerónimo; en frontend, Oscar o Gabriel. Además se revisan entre ellas.</li>
+      </ul>
+    </div>
+    <div class="callout">
+      <h3>Parejas por módulo</h3>
+      <p>Cada persona de frontend consume las rutas de una persona de backend y acuerdan juntas los detalles: <b>Rony ↔ Oscar</b> (login y usuarios) y <b>Jerónimo ↔ Gabriel</b> (inventario). En ventas no hace falta pareja entre equipos: <b>Jacqueline y Chinchaiguara</b> llevan el módulo completo y acuerdan sus rutas entre ellas.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-tareas">
+    <div class="section-head">
+      <span class="eyebrow">Qué hace cada uno</span>
+      <h2 id="s-tareas">Tareas por integrante</h2>
+    </div>
+    <h3 class="layer-title back-title">Backend · <code>tecnifix-backend/</code></h3>
+    <div class="table-wrap">
+      <table class="team-table">
+        <thead><tr><th>Integrante</th><th>Se encarga de</th><th>Archivos que le pertenecen</th><th>Semanas que aplica</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="who">Rony<small>líder backend</small></td>
+            <td><ul class="tight">
+              <li>Migración con las 11 tablas y datos de prueba</li>
+              <li>Login con JWT y bcrypt</li>
+              <li>Usuarios y roles (solo admin)</li>
+              <li>Middleware <code>verificarRol</code></li>
+              <li>Bloqueo de cuenta tras 5 intentos fallidos</li>
+              <li>Límite de peticiones y CORS</li>
+              <li>Formato de respuesta y helper de paginación</li>
+              <li>Pruebas en GitHub Actions</li>
+              <li>Despliegue en Render y Supabase</li>
+            </ul></td>
+            <td><ul class="tight">
+              <li><code>src/app.js</code>, <code>src/server.js</code></li>
+              <li><code>src/routes/index.js</code></li>
+              <li><code>src/config/</code>, <code>src/middlewares/</code>, <code>src/utils/</code></li>
+              <li><code>src/database/</code></li>
+              <li>todo lo de <code>auth</code> y <code>usuarios</code></li>
+              <li><code>tecnifix-backend/package.json</code></li>
+              <li><code>.github/</code></li>
+            </ul></td>
+            <td>4, 5, 7, 8, 13</td>
+          </tr>
+          <tr>
+            <td class="who">Jerónimo</td>
+            <td><ul class="tight">
+              <li>Productos: alta, edición, desactivar, búsqueda y filtros por categoría</li>
+              <li>Categorías y proveedores</li>
+              <li>Compras a proveedores: suben el stock en una transacción</li>
+              <li>Ajustes de stock (solo admin)</li>
+              <li>Kardex de cada producto</li>
+              <li>Alerta de stock mínimo y correo al administrador</li>
+            </ul></td>
+            <td><ul class="tight">
+              <li>todo lo de <code>productos</code>, <code>categorias</code>, <code>proveedores</code>, <code>compras</code>, <code>inventario</code></li>
+              <li><code>src/services/correo.service.js</code></li>
+              <li>pruebas de sus módulos</li>
+            </ul></td>
+            <td>4, 5, 12</td>
+          </tr>
+          <tr>
+            <td class="who">Jacqueline y Chinchaiguara<small>pareja de ventas · por turnos</small></td>
+            <td><ul class="tight">
+              <li>Clientes con DNI o RUC, búsqueda e historial de compras</li>
+              <li>Ventas: cálculo de IGV, numeración de boleta y factura, descuento de stock en una transacción</li>
+              <li>Anulación de ventas (devuelve el stock)</li>
+              <li>Pago simulado</li>
+              <li>Reportes: ventas por día y por mes, productos más vendidos, ventas por vendedor</li>
+            </ul></td>
+            <td><ul class="tight">
+              <li>todo lo de <code>clientes</code>, <code>ventas</code>, <code>pagos</code>, <code>reportes</code></li>
+              <li>pruebas de sus módulos</li>
+            </ul></td>
+            <td>4, 5, 7</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">"Todo lo de <code>productos</code>" significa sus archivos en cada capa: <code>routes/productos.routes.js</code>, <code>controllers/productos.controller.js</code>, <code>services/productos.service.js</code>, <code>repositories/productos.repository.js</code> y <code>validators/productos.validator.js</code>. Para descontar stock en una venta, la pareja de ventas llama a una función de <code>productos.repository.js</code> que Jerónimo deja lista para eso; no edita ese archivo.</p>
+
+    <h3 class="layer-title front-title">Frontend · <code>tecnifix-frontend/</code></h3>
+    <div class="table-wrap">
+      <table class="team-table">
+        <thead><tr><th>Integrante</th><th>Se encarga de</th><th>Archivos que le pertenecen</th><th>Semanas que aplica</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="who">Oscar<small>líder frontend</small></td>
+            <td><ul class="tight">
+              <li>Tailwind CSS y shadcn/ui con los colores de TecniFix</li>
+              <li>Layout con menú según el rol</li>
+              <li>Sesión, <code>fetcher</code> y protección de páginas por rol</li>
+              <li>Login y gestión de usuarios</li>
+                            <li>Metadata por página y robots que no indexa el panel interno</li>
+              <li>Formato de los datos de prueba: cada uno crea su <code>src/mocks/&lt;modulo&gt;.mock.js</code></li>
+              <li>Despliegue en Vercel</li>
+            </ul></td>
+            <td><ul class="tight">
+              <li><code>src/app/layout.js</code>, <code>src/app/page.js</code>, <code>src/app/(panel)/layout.js</code></li>
+              <li><code>src/app/(publico)/login/</code>, <code>src/app/(panel)/usuarios/</code></li>
+              <li><code>src/app/robots.js</code></li>
+              <li><code>src/components/ui/</code>, <code>layout/</code></li>
+              <li><code>src/context/</code>, <code>hooks/</code>, <code>lib/</code></li>
+              <li><code>tecnifix-frontend/package.json</code> y configuración de Tailwind</li>
+            </ul></td>
+            <td>7, 9, 10, 11, 14</td>
+          </tr>
+          <tr>
+            <td class="who">Gabriel</td>
+            <td><ul class="tight">
+              <li>Listado de productos con búsqueda, filtro por categoría y paginación</li>
+              <li>Formulario de producto validado</li>
+              <li>Detalle del producto con su kardex</li>
+              <li>Categorías y proveedores</li>
+              <li>Registro de compras (entrada de mercadería)</li>
+              <li>Pantalla de alertas de stock mínimo</li>
+            </ul></td>
+            <td><ul class="tight">
+              <li><code>src/app/(panel)/productos/</code>, <code>categorias/</code>, <code>proveedores/</code>, <code>compras/</code></li>
+              <li><code>src/components/inventario/</code></li>
+              <li><code>src/services/</code>: <code>productos</code>, <code>categorias</code>, <code>proveedores</code>, <code>compras</code></li>
+            </ul></td>
+            <td>7, 9, 10, 11</td>
+          </tr>
+          <tr>
+            <td class="who">Jacqueline y Chinchaiguara<small>pareja de ventas · por turnos</small></td>
+            <td><ul class="tight">
+              <li>Clientes: listado con búsqueda, formulario validado y ficha con su historial</li>
+              <li>Caja de ventas: buscar productos, carrito, cliente, boleta o factura</li>
+              <li>Pantalla de pago simulado</li>
+              <li>Comprobante de la venta</li>
+              <li>Historial de ventas y anulación</li>
+              <li>Dashboard con gráficos</li>
+            </ul></td>
+            <td><ul class="tight">
+              <li><code>src/app/(panel)/clientes/</code>, <code>ventas/</code>, <code>dashboard/</code>, <code>reportes/</code></li>
+              <li><code>src/components/clientes/</code>, <code>ventas/</code>, <code>dashboard/</code></li>
+              <li><code>src/services/</code>: <code>clientes</code>, <code>ventas</code>, <code>pagos</code>, <code>reportes</code></li>
+            </ul></td>
+            <td>9, 10, 11</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">La caja de la pareja de ventas busca productos con <code>productos.service.js</code> de Gabriel: lo importa, no lo modifica. Si alguien necesita un componente común nuevo, se lo pide a Oscar: <code>components/ui/</code> tiene un solo dueño.</p>
+  </section>
+
+  <section aria-labelledby="s-propiedad">
+    <div class="section-head">
+      <span class="eyebrow">Mapa del repositorio</span>
+      <h2 id="s-propiedad">Quién toca cada carpeta</h2>
+    </div>
+    <div class="two">
+      <div class="tree back-tree" aria-label="Carpetas del backend y sus dueños">
+<pre><span class="d">tecnifix-backend/</span>             <span class="o">equipo backend</span>
+├─ package.json               <span class="o">Rony</span>
+├─ src/
+│  ├─ app.js, server.js       <span class="o">Rony</span>
+│  ├─ config/ middlewares/    <span class="o">Rony</span>
+│  ├─ utils/                  <span class="o">Rony</span>
+│  ├─ database/migrations/    <span class="o">Rony crea 002</span>
+│  │                          <span class="o">luego un archivo nuevo por cambio</span>
+│  ├─ routes/index.js         <span class="o">Rony</span>
+│  ├─ routes/ controllers/ services/
+│  │  repositories/ validators/
+│  │  ├─ auth.*  usuarios.*   <span class="o">Rony</span>
+│  │  ├─ productos.*          <span class="o">Jerónimo</span>
+│  │  ├─ categorias.*         <span class="o">Jerónimo</span>
+│  │  ├─ proveedores.*        <span class="o">Jerónimo</span>
+│  │  ├─ compras.*            <span class="o">Jerónimo</span>
+│  │  ├─ inventario.*         <span class="o">Jerónimo</span>
+│  │  ├─ clientes.*           <span class="o">Jacqueline y Chinchaiguara</span>
+│  │  ├─ ventas.*  pagos.*    <span class="o">Jacqueline y Chinchaiguara</span>
+│  │  └─ reportes.*           <span class="o">Jacqueline y Chinchaiguara</span>
+└─ tests/                     <span class="o">cada uno, sus módulos</span></pre>
+      </div>
+      <div class="tree front-tree" aria-label="Carpetas del frontend y sus dueños">
+<pre><span class="d">tecnifix-frontend/</span>            <span class="o">equipo frontend</span>
+├─ package.json, tailwind     <span class="o">Oscar</span>
+├─ src/
+│  ├─ app/
+│  │  ├─ layout.js page.js    <span class="o">Oscar</span>
+│  │  ├─ robots.js            <span class="o">Oscar</span>
+│  │  ├─ (publico)/login/     <span class="o">Oscar</span>
+│  │  └─ (panel)/
+│  │     ├─ layout.js         <span class="o">Oscar · menú y protección</span>
+│  │     ├─ usuarios/         <span class="o">Oscar</span>
+│  │     ├─ productos/        <span class="o">Gabriel</span>
+│  │     ├─ categorias/       <span class="o">Gabriel</span>
+│  │     ├─ proveedores/      <span class="o">Gabriel</span>
+│  │     ├─ compras/          <span class="o">Gabriel</span>
+│  │     ├─ clientes/ ventas/ <span class="o">Jacqueline y Chinchaiguara</span>
+│  │     └─ dashboard/ reportes/
+│  │                          <span class="o">Jacqueline y Chinchaiguara</span>
+│  ├─ components/
+│  │  ├─ ui/ layout/          <span class="o">Oscar</span>
+│  │  ├─ inventario/          <span class="o">Gabriel</span>
+│  │  └─ clientes/ ventas/    <span class="o">Jacqueline y Chinchaiguara</span>
+│  │     dashboard/           <span class="o">Jacqueline y Chinchaiguara</span>
+│  ├─ context/ hooks/ lib/    <span class="o">Oscar</span>
+│  ├─ mocks/                  <span class="o">cada uno, su modulo.mock.js</span>
+│  └─ services/
+│     ├─ auth usuarios        <span class="o">Oscar</span>
+│     ├─ productos categorias <span class="o">Gabriel</span>
+│     │  proveedores compras  <span class="o">Gabriel</span>
+│     └─ clientes ventas      <span class="o">Jacqueline y Chinchaiguara</span>
+│        pagos reportes       <span class="o">Jacqueline y Chinchaiguara</span></pre>
+      </div>
+    </div>
+    <p class="cap">Fuera de las dos carpetas: <code>README.md</code> y <code>.github/</code> son de Rony, y <code>docs/API.md</code> (el contrato) lo escribe el equipo backend y lo aprueba Oscar.</p>
+  </section>
+
+  <section aria-labelledby="s-reglas">
+    <div class="section-head">
+      <span class="eyebrow">Al subir cambios</span>
+      <h2 id="s-reglas">Reglas para no pisarse</h2>
+    </div>
+    <div class="rules">
+      <article><h3>1. Cada equipo, su carpeta</h3><p>Backend solo modifica <code>tecnifix-backend/</code> y frontend solo <code>tecnifix-frontend/</code>. Si frontend necesita algo distinto de la API, lo pide en un <i>issue</i>; no corrige el backend por su cuenta.</p></article>
+      <article><h3>2. Dentro del equipo, cada uno sus archivos</h3><p>Cada persona solo edita los archivos de su módulo (las tablas de arriba). Los archivos compartidos tienen un único dueño: Rony en backend y Oscar en frontend.</p></article>
+      <article><h3>3. Todos en main, con cuidado</h3><p>El grupo trabaja directo en <code>main</code>, sin ramas. Por eso: commits pequeños, push al terminar cada tarea y nunca más de un día con cambios sin subir.</p></article>
+      <article><h3>4. Actualizarse antes de subir</h3><p>Al empezar el día, antes de cada commit y antes de cada push: <code>git pull --rebase origin main</code>. Si aparece un conflicto, se resuelve en tu computadora; nunca se sube con conflictos.</p></article>
+      <article><h3>5. Dependencias solo por el líder</h3><p>Instalar paquetes cambia <code>package.json</code> y <code>package-lock.json</code>, los archivos que más conflictos causan. Se le pide al líder de la capa (Rony u Oscar) y él lo instala.</p></article>
+      <article><h3>6. Migraciones nuevas, nunca editadas</h3><p>Un cambio en la base es un archivo nuevo numerado, por ejemplo <code>003_stock_minimo.sql</code>. Nunca se modifica una migración que ya está en <code>main</code>.</p></article>
+      <article><h3>7. Avisar y revisar</h3><p>Al subir, avisa en <code>#tecnifix-avisos</code> qué cambiaste. Alguien de tu capa mira el commit en GitHub y comenta si ve algo raro; si algo se rompe, lo arregla el líder de la capa con quien lo subió.</p></article>
+      <article><h3>8. Los secretos no se suben</h3><p>Cada uno tiene su <code>.env</code> local. Solo se suben los <code>.env.example</code>. Las claves reales van en los paneles de Render y Vercel. Lista completa más abajo.</p></article>
+    </div>
+    <div class="code-block">
+      <div class="code-head">.github/CODEOWNERS <span>lo crea Rony; cambien los usuarios por los reales de GitHub</span></div>
+<pre><code># Cada carpeta solo se aprueba por su equipo
+/tecnifix-backend/      @Rony10-az @usuario-jeronimo @usuario-jacqueline @usuario-chinchaiguara
+/tecnifix-frontend/     @oscarjscom @usuario-gabriel @usuario-jacqueline @usuario-chinchaiguara
+/docs/API.md   @Rony10-az @oscarjscom
+/.github/      @Rony10-az</code></pre>
+    </div>
+    <p class="cap">Como el grupo trabaja directo en <code>main</code>, <code>CODEOWNERS</code> no bloquea nada: queda como mapa de quién es dueño de cada carpeta. En GitHub → Settings → Branches, Rony solo bloquea el <i>force push</i> y el borrado de <code>main</code>; no se activa "Require a pull request".</p>
+
+    <h3 class="sub" id="s-commits">Antes de cada commit</h3>
+    <p class="cap">Esta rutina la sigue cada uno cada vez que sube algo a <code>main</code>.</p>
+    <ol class="steps">
+      <li><div><b>Mira qué cambió</b> con <code>git status</code>. Si aparece un archivo que no es tuyo o que no tocaste, no lo subas: pregunta primero.</div></li>
+      <li><div><b>Agrega los archivos por nombre</b>: <code>git add frontend/src/app/productos/page.js</code>. Nunca <code>git add .</code> ni <code>git add -A</code>, que suben de todo, incluso lo que no debe salir de tu computadora.</div></li>
+      <li><div><b>Revisa línea por línea</b> con <code>git diff --staged</code>: sin contraseñas, tokens, <code>console.log</code> de datos personales, código de prueba comentado ni archivos ajenos.</div></li>
+      <li><div><b>Corre las pruebas</b>: <code>npm test</code> en backend; <code>npm run lint</code> y <code>npm run build</code> en frontend. Si algo falla, no se sube.</div></li>
+      <li><div><b>Escribe el mensaje</b> en español, en primera persona y con prefijo: <code>feat: agrego el filtro por categoría en productos</code>. Un commit por cambio lógico; no mezcles módulos.</div></li>
+      <li><div><b>Sin firmas ni menciones de IA</b>: borra cualquier <code>Co-Authored-By</code> de un asistente o texto como "generado con". El commit es tuyo.</div></li>
+      <li><div><b>Actualízate y sube</b>: <code>git pull --rebase origin main</code> y luego <code>git push origin main</code>. Nunca con <code>--force</code>. Después avisa en <code>#tecnifix-avisos</code> qué subiste.</div></li>
+    </ol>
+
+    <div class="two">
+      <article class="panel">
+        <h3>Nunca se sube al repositorio</h3>
+        <ul>
+          <li><code>.env</code> y cualquier <code>.env.*</code>. Solo se sube <code>.env.example</code>, con valores de ejemplo.</li>
+          <li><code>node_modules/</code>, <code>.next/</code>, <code>coverage/</code> y demás carpetas generadas.</li>
+          <li><code>.vercel/</code>: <code>vercel link</code> crea ahí un archivo con un token de acceso.</li>
+          <li>Archivos propios de cada asistente de IA y ajustes personales del editor. Esos no van en el <code>.gitignore</code>: cada uno los agrega en <code>.git/info/exclude</code> de su copia, que es un ignore local que nunca se sube.</li>
+          <li>Documentos de entrega (<code>.docx</code>, <code>.pdf</code>, <code>.pptx</code>), capturas y notas personales.</li>
+          <li>Copias de la base de datos con datos reales.</li>
+        </ul>
+      </article>
+      <article class="panel">
+        <h3>Protecciones que activa Rony en GitHub</h3>
+        <ul>
+          <li><b>Branch protection</b> en <code>main</code>: bloquear el <i>force push</i> y el borrado. Sin "Require a pull request", porque trabajan directo en <code>main</code>.</li>
+          <li><b>Secret scanning</b> con <b>push protection</b> (Settings → Code security): GitHub bloquea el push si detecta una clave o un token.</li>
+          <li>GitHub Actions corre las pruebas en cada push: si sale en rojo, se arregla antes de seguir subiendo.</li>
+          <li>Las claves reales solo en los paneles de Render, Vercel y Supabase, nunca en el código.</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="callout">
+      <h3>Si un secreto se sube por error</h3>
+      <p>Borrar el archivo en un commit nuevo <b>no basta</b>: queda en el historial de Git y cualquiera con acceso puede verlo. Lo primero es <b>cambiar la clave</b> (nueva contraseña de Supabase o nuevo <code>JWT_SECRET</code>) y actualizarla en Render y Vercel; después se avisa a Rony para limpiar el historial.</p>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-head"><span>.gitignore de la raíz</span><button type="button" class="copy" data-copy="gitignore-raiz">Copiar</button></div>
+      <pre id="gitignore-raiz"># Dependencias y compilados
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+
+# Variables de entorno: solo se sube .env.example
+.env
+.env.*
+!.env.example
+
+# Despliegue (vercel link crea aquí un token)
+.vercel/
+
+# Ajustes personales del editor y notas
+.obsidian/
+.vscode/settings.json
+# Los archivos propios de cada asistente de IA NO van aquí:
+# cada uno los agrega en .git/info/exclude (exclusiones locales que no se suben).
+
+# Documentos de entrega y archivos personales
+*.docx
+*.pdf
+*.pptx
+*.xlsx
+
+# Copias de la base de datos
+*.dump
+*.backup
+
+# Registros y archivos del sistema
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+</pre>
+    </div>
+    <p class="cap">Lo sube Rony junto con <code>AGENTS.md</code> y <code>CODEOWNERS</code>. Las carpetas <code>backend/</code> y <code>frontend/</code> conservan sus propios <code>.gitignore</code>.</p>
+
+  </section>
+
+  <section aria-labelledby="s-discord">
+    <div class="section-head">
+      <span class="eyebrow">Avisos del equipo</span>
+      <h2 id="s-discord">Notificaciones en Discord</h2>
+      <p>Igual que en la pretesis: cada vez que alguien sube commits, abre o une un Pull Request, comenta o crea un issue, llega un mensaje a Discord. Así todos saben qué se movió sin preguntar por WhatsApp.</p>
+      <p>Va en un <b>canal propio</b>, <code>#tecnifix-avisos</code>, en el mismo servidor <b>PROGRAMANDING</b>, separado de <code>#fixmycity-avisos</code>: cada repositorio tiene su propio webhook y su propio canal, así los avisos de la pretesis y los de este trabajo no se mezclan. Los 6 integrantes deben estar en el servidor; inviten a quien falte.</p>
+    </div>
+
+    <div class="two">
+      <article class="panel">
+        <h3>Opción 1 · Webhook directo (recomendada)</h3>
+        <p>No necesita código: se configura una vez y ya. Es la forma más rápida.</p>
+        <ol class="mini">
+          <li>En el servidor <b>PROGRAMANDING</b>, crea el canal de texto <code>#tecnifix-avisos</code>. Si quieren ordenarlo mejor, créenlo dentro de una categoría <b>TECNIFIX</b>.</li>
+          <li>Configuración del canal → <b>Integraciones</b> → <b>Webhooks</b> → <b>Nuevo webhook</b>. Ponle de nombre "TecniFix" y pulsa <b>Copiar URL del webhook</b>. Es un webhook nuevo: no reutilices el de <code>#fixmycity-avisos</code>, porque ese manda al canal de la pretesis.</li>
+          <li>Pásale esa URL a Rony <b>por privado</b>, nunca en el grupo ni en el repositorio.</li>
+          <li>Rony, en GitHub: repositorio → <b>Settings</b> → <b>Webhooks</b> → <b>Add webhook</b>.</li>
+          <li><b>Payload URL</b>: la URL de Discord con <code>/github</code> al final. Sin eso, Discord no entiende los mensajes de GitHub.</li>
+          <li><b>Content type</b>: <code>application/json</code>. El campo Secret se deja vacío.</li>
+          <li>En eventos elige <b>Let me select individual events</b> y marca: Pushes, Pull requests, Pull request reviews, Issues, Issue comments y Branch or tag creation.</li>
+          <li><b>Add webhook</b> y prueba con un push a cualquier rama: el mensaje llega en segundos.</li>
+        </ol>
+      </article>
+      <article class="panel">
+        <h3>Opción 2 · Mensajes en español con GitHub Actions</h3>
+        <p>Si prefieren avisos más cortos y en español, por ejemplo "<b>Gabriel</b> subió cambios a <code>front/productos-listado</code>", se usa el workflow de abajo.</p>
+        <ol class="mini">
+          <li>Crear el webhook en Discord como en los pasos 1 a 3 de la opción 1.</li>
+          <li>Rony guarda la URL en GitHub: <b>Settings</b> → <b>Secrets and variables</b> → <b>Actions</b> → <b>New repository secret</b>, con el nombre <code>DISCORD_WEBHOOK</code>.</li>
+          <li>Rony sube <code>.github/workflows/discord.yml</code> (archivo de abajo) en un Pull Request.</li>
+        </ol>
+        <p class="cap">Usen una sola de las dos opciones; con las dos, cada aviso llega duplicado.</p>
+      </article>
+    </div>
+
+    <div class="callout">
+      <h3>La URL del webhook es un secreto</h3>
+      <p>Con esa URL cualquiera puede escribir en su canal de Discord. No se sube al repositorio, no se pega en el grupo y no se le pasa a la IA. Si se filtra, en Discord se elimina el webhook y se crea otro nuevo.</p>
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-head"><span>.github/workflows/discord.yml (opción 2)</span><button type="button" class="copy" data-copy="discord-yml">Copiar</button></div>
+      <pre id="discord-yml"># .github/workflows/discord.yml
+# Avisa en Discord, en español, cada vez que alguien sube commits o mueve un Pull Request.
+# Requiere el secreto DISCORD_WEBHOOK (Settings → Secrets and variables → Actions).
+# Los datos del evento entran como variables de entorno para que un mensaje de commit
+# con caracteres raros no se ejecute como código en el runner.
+name: Avisos en Discord
+
+on:
+  push:
+  pull_request:
+    types: [opened, reopened, closed]
+
+jobs:
+  avisar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enviar mensaje a Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          EVENTO: ${{ github.event_name }}
+          AUTOR: ${{ github.actor }}
+          RAMA: ${{ github.ref_name }}
+          MENSAJE: ${{ github.event.head_commit.message }}
+          ENLACE_CAMBIOS: ${{ github.event.compare }}
+          PR_ACCION: ${{ github.event.action }}
+          PR_UNIDO: ${{ github.event.pull_request.merged }}
+          PR_TITULO: ${{ github.event.pull_request.title }}
+          PR_ORIGEN: ${{ github.event.pull_request.head.ref }}
+          PR_ENLACE: ${{ github.event.pull_request.html_url }}
+        run: |
+          if [ -z &quot;$DISCORD_WEBHOOK&quot; ]; then
+            echo &quot;Falta el secreto DISCORD_WEBHOOK; no se envía nada.&quot;
+            exit 0
+          fi
+          if [ &quot;$EVENTO&quot; = &quot;push&quot; ]; then
+            TEXTO=&quot;**$AUTOR** subió cambios a \`$RAMA\`: $MENSAJE
+          $ENLACE_CAMBIOS&quot;
+          elif [ &quot;$PR_ACCION&quot; = &quot;closed&quot; ] &amp;&amp; [ &quot;$PR_UNIDO&quot; = &quot;true&quot; ]; then
+            TEXTO=&quot;**$AUTOR** unió \`$PR_ORIGEN\` a main: $PR_TITULO
+          $PR_ENLACE&quot;
+          elif [ &quot;$PR_ACCION&quot; = &quot;closed&quot; ]; then
+            TEXTO=&quot;**$AUTOR** cerró sin unir el Pull Request: $PR_TITULO
+          $PR_ENLACE&quot;
+          else
+            TEXTO=&quot;**$AUTOR** abrió un Pull Request desde \`$PR_ORIGEN\`: $PR_TITULO
+          $PR_ENLACE&quot;
+          fi
+          jq -n --arg texto &quot;$TEXTO&quot; &#x27;{content: $texto}&#x27; \
+            | curl -sS -H &quot;Content-Type: application/json&quot; -d @- &quot;$DISCORD_WEBHOOK&quot;
+</pre>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-contrato">
+    <div class="section-head">
+      <span class="eyebrow">El punto de unión</span>
+      <h2 id="s-contrato">Contrato de la API</h2>
+      <p>Es lo único que los dos equipos comparten. Se acuerda al inicio y se guarda en <code>docs/API.md</code>. Mientras una ruta no exista, frontend trabaja con datos de prueba con esta misma forma, y cuando backend la termina solo se cambia la URL.</p>
+    </div>
+    <div class="two">
+      <article class="panel">
+        <h3>Formato de las respuestas</h3>
+        <ul>
+          <li>Éxito: los datos directamente, por ejemplo <code>{ "id": 142, "serie_numero": "B001-000142", "total": 119.00, ... }</code>.</li>
+          <li>Listados: <code>{ "data": [...], "total": 87, "pagina": 1, "limite": 10 }</code>, con <code>?pagina=</code>, <code>?limite=</code> y <code>?buscar=</code>.</li>
+          <li>Error: <code>{ "error": "mensaje" }</code>, como ya hace el backend.</li>
+          <li>Error de validación: <code>{ "error": "Datos inválidos", "campos": { "documento": "El DNI debe tener 8 dígitos" } }</code>.</li>
+        </ul>
+      </article>
+      <article class="panel">
+        <h3>Códigos de estado</h3>
+        <ul>
+          <li><code>200</code> correcto · <code>201</code> creado</li>
+          <li><code>400</code> datos inválidos · <code>404</code> no existe</li>
+          <li><code>401</code> sin sesión o token vencido</li>
+          <li><code>403</code> su rol no puede hacer eso</li>
+          <li><code>409</code> stock insuficiente o venta ya anulada</li>
+          <li><code>423</code> cuenta bloqueada por intentos fallidos</li>
+        </ul>
+      </article>
+    </div>
+    <div class="table-wrap">
+      <table class="api">
+        <thead><tr><th>Método</th><th>Ruta</th><th>Quién puede</th><th>Backend</th><th>Frontend</th></tr></thead>
+        <tbody>
+          <tr><td>POST</td><td><code>/auth/login</code></td><td>Público</td><td>Rony</td><td>Oscar</td></tr>
+          <tr><td>GET POST PUT</td><td><code>/usuarios</code>, <code>/usuarios/:id</code></td><td>Admin</td><td>Rony</td><td>Oscar</td></tr>
+          <tr><td>GET POST PUT</td><td><code>/categorias</code>, <code>/proveedores</code></td><td>Admin, almacenero; todos ven</td><td>Jerónimo</td><td>Gabriel</td></tr>
+          <tr><td>GET POST</td><td><code>/productos?buscar=&amp;categoria=&amp;stockBajo=</code></td><td>Todos ven; admin y almacenero crean</td><td>Jerónimo</td><td>Gabriel y la pareja de ventas</td></tr>
+          <tr><td>GET PUT DELETE</td><td><code>/productos/:id</code></td><td>Admin; almacenero sin precios</td><td>Jerónimo</td><td>Gabriel</td></tr>
+          <tr><td>GET</td><td><code>/productos/:id/movimientos</code></td><td>Admin, almacenero</td><td>Jerónimo</td><td>Gabriel</td></tr>
+          <tr><td>GET POST</td><td><code>/compras</code>, <code>/compras/:id</code></td><td>Admin, almacenero</td><td>Jerónimo</td><td>Gabriel</td></tr>
+          <tr><td>POST</td><td><code>/inventario/ajustes</code></td><td>Admin</td><td>Jerónimo</td><td>Gabriel</td></tr>
+          <tr><td>GET POST</td><td><code>/clientes?buscar=</code></td><td>Admin, vendedor</td><td>Jacqueline y Chinchaiguara</td><td>Jacqueline y Chinchaiguara</td></tr>
+          <tr><td>GET PUT</td><td><code>/clientes/:id</code>, <code>/clientes/:id/ventas</code></td><td>Admin, vendedor</td><td>Jacqueline y Chinchaiguara</td><td>Jacqueline y Chinchaiguara</td></tr>
+          <tr><td>GET POST</td><td><code>/ventas</code>, <code>/ventas/:id</code></td><td>Admin, vendedor</td><td>Jacqueline y Chinchaiguara</td><td>Jacqueline y Chinchaiguara</td></tr>
+          <tr><td>PATCH</td><td><code>/ventas/:id/anular</code></td><td>Admin</td><td>Jacqueline y Chinchaiguara</td><td>Jacqueline y Chinchaiguara</td></tr>
+          <tr><td>POST</td><td><code>/pagos/simular</code></td><td>Admin, vendedor</td><td>Jacqueline y Chinchaiguara</td><td>Jacqueline y Chinchaiguara</td></tr>
+          <tr><td>GET</td><td><code>/reportes/resumen?desde=&amp;hasta=</code></td><td>Admin; vendedor solo el suyo</td><td>Jacqueline y Chinchaiguara</td><td>Jacqueline y Chinchaiguara</td></tr>
+          <tr><td>GET</td><td><code>/reportes/productos-mas-vendidos</code></td><td>Admin</td><td>Jacqueline y Chinchaiguara</td><td>Jacqueline y Chinchaiguara</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">Las rutas no llevan el prefijo <code>/api/</code>, como ya definió Rony en el README. La caja de la pareja de ventas usa <code>GET /productos</code> de Jerónimo para buscar productos: es la única ruta que cruza parejas.</p>
+  </section>
+
+  <section aria-labelledby="s-ia">
+    <div class="section-head">
+      <span class="eyebrow">Trabajo con IA</span>
+      <h2 id="s-ia">Pautas para que todas las IA trabajen igual</h2>
+      <p>Si cada uno usa su IA sin contexto, cada una inventa nombres, rutas y formatos distintos, y el código no encaja al unirlo. Para que las seis estén sincronizadas se usan tres cosas: un archivo de contexto común en el repositorio, un prompt de inicio por persona y unas reglas de uso.</p>
+    </div>
+
+    <div class="two">
+      <article class="panel">
+        <h3>1. Un archivo de contexto en el repositorio</h3>
+        <p><code>AGENTS.md</code> en la raíz: qué es TecniFix, el stack, las capas, quién es dueño de cada archivo, el modelo de datos, el formato de respuestas, las rutas y las reglas. Es la única fuente de verdad: si una decisión cambia, se cambia ahí (solo los líderes) y todas las IA se enteran.</p>
+        <p>Lleva un nombre neutral a propósito: en el repositorio no debe aparecer el nombre de ninguna herramienta de IA.</p>
+      </article>
+      <article class="panel">
+        <h3>Cómo lo lee cada herramienta</h3>
+        <ul>
+          <li><b>Asistentes con su propio archivo de instrucciones</b>: crea ese archivo solo en tu copia local, haz que apunte a <code>AGENTS.md</code> y agrégalo a <code>.git/info/exclude</code>, así nunca se sube.</li>
+          <li><b>Codex y Cursor</b>: leen <code>AGENTS.md</code> de la raíz.</li>
+          <li><b>Copilot en VS Code</b>: agrega <code>AGENTS.md</code> como contexto en el chat (<code>#file:AGENTS.md</code>).</li>
+          <li><b>ChatGPT o Gemini en el navegador</b>: pega el contenido de <code>AGENTS.md</code> al inicio de cada conversación, y luego tu prompt de inicio.</li>
+        </ul>
+      </article>
+    </div>
+
+    <h3 class="sub">2. Reglas para usar la IA</h3>
+    <div class="rules">
+      <article><h3>Contexto siempre</h3><p>Cada conversación nueva empieza con <code>AGENTS.md</code> y tu prompt de inicio. Sin eso, la IA no sabe qué archivos son tuyos.</p></article>
+      <article><h3>Una tarea pequeña por conversación</h3><p>Por ejemplo "listado de productos con paginación", no "todo el inventario". Así es fácil revisar lo que entrega.</p></article>
+      <article><h3>Plan antes que código</h3><p>Pide primero el plan y la lista de archivos. Si incluye un archivo que no es tuyo, corrígelo antes de que escriba nada.</p></article>
+      <article><h3>Tú respondes por el código</h3><p>Lee y entiende cada línea antes de subirla. En la presentación vas a explicar tu parte; si algo no lo entiendes, pide que te lo explique.</p></article>
+      <article><h3>Nada de secretos</h3><p>Nunca pegues el <code>.env</code>, la contraseña de Supabase, el <code>JWT_SECRET</code> ni tokens. La IA no los necesita.</p></article>
+      <article><h3>Ni paquetes ni migraciones</h3><p>Si la IA propone instalar una librería, cambiar una migración o tocar la otra capa, no lo hagas: pídeselo a tu líder.</p></article>
+      <article><h3>Revisión antes de subir</h3><p>Pasa tu <code>git diff --staged</code> por el prompt de revisión de abajo y corre las pruebas antes de cada push a <code>main</code>.</p></article>
+      <article><h3>Sin rastros de la IA</h3><p>Nada de líneas <code>Co-Authored-By</code> de asistentes, "generado con" ni menciones a herramientas de IA en commits, comentarios, README ni Pull Requests. Si tu herramienta las agrega sola, bórralas antes de subir.</p></article>
+      <article><h3>La IA no sube nada</h3><p>La IA propone; tú haces el commit y el push. No la dejes ejecutar <code>git add .</code>, <code>git push</code> ni comandos que borren archivos.</p></article>
+      <article><h3>AGENTS.md manda</h3><p>Si la IA propone algo distinto a <code>AGENTS.md</code> (otro nombre de campo, otra ruta, otro formato), corrígela citando la regla. Si la regla está mal, no la ignores: pide al líder que la cambie en <code>AGENTS.md</code> para que todos se enteren.</p></article>
+    </div>
+
+    <h3 class="sub">3. Prompt de inicio de cada integrante</h3>
+    <p class="cap">Cópialo al empezar cada conversación y reemplaza la línea de la tarea. Jacqueline y Chinchaiguara usan el de la capa en la que trabajen ese día y escriben su nombre.</p>
+    <div class="prompts">
+      <div class="prompt-card back-p"><div class="prompt-head"><span>Rony</span><span class="cap-tag backend">backend</span><button type="button" class="copy" data-copy="prompt-1">Copiar</button></div><pre id="prompt-1">Trabajo en el proyecto TecniFix (repositorio Sistema_de_Gestion_de_Ventas).
+Antes de nada, lee AGENTS.md y síguelo. Si no puedes ver el repositorio, te lo pego a continuación.
+
+Soy Rony, del equipo backend. Mi parte: líder del backend: base, usuarios, roles y seguridad.
+Solo puedes crear o modificar estos archivos de tecnifix-backend/: src/app.js, src/server.js, src/routes/index.js, src/config/, src/middlewares/, src/utils/, src/database/, todo lo de auth y usuarios, tecnifix-backend/package.json, .github/ y README.md.
+No toques nada fuera de esa lista. Si la tarea lo necesita, detente y dime qué pedirle y a quién.
+Respeta el contrato de docs/API.md y el formato de respuestas de AGENTS.md. No agregues dependencias.
+
+Tarea de hoy: [describe aquí la tarea]
+
+Antes de escribir código, dame un plan corto con los archivos que vas a tocar y espera mi confirmación.</pre></div><div class="prompt-card back-p"><div class="prompt-head"><span>Jerónimo</span><span class="cap-tag backend">backend</span><button type="button" class="copy" data-copy="prompt-2">Copiar</button></div><pre id="prompt-2">Trabajo en el proyecto TecniFix (repositorio Sistema_de_Gestion_de_Ventas).
+Antes de nada, lee AGENTS.md y síguelo. Si no puedes ver el repositorio, te lo pego a continuación.
+
+Soy Jerónimo, del equipo backend. Mi parte: inventario: productos, categorías, proveedores, compras y kardex.
+Solo puedes crear o modificar estos archivos de tecnifix-backend/: todo lo de productos, categorias, proveedores, compras e inventario (routes, controllers, services, repositories, validators y sus pruebas) y src/services/correo.service.js.
+No toques nada fuera de esa lista. Si la tarea lo necesita, detente y dime qué pedirle y a quién.
+Respeta el contrato de docs/API.md y el formato de respuestas de AGENTS.md. No agregues dependencias.
+
+Tarea de hoy: [describe aquí la tarea]
+
+Antes de escribir código, dame un plan corto con los archivos que vas a tocar y espera mi confirmación.</pre></div><div class="prompt-card back-p"><div class="prompt-head"><span>Jacqueline o Chinchaiguara</span><span class="cap-tag backend">backend</span><button type="button" class="copy" data-copy="prompt-3">Copiar</button></div><pre id="prompt-3">Trabajo en el proyecto TecniFix (repositorio Sistema_de_Gestion_de_Ventas).
+Antes de nada, lee AGENTS.md y síguelo. Si no puedes ver el repositorio, te lo pego a continuación.
+
+Soy [Jacqueline o Chinchaiguara], del equipo backend. Mi parte: pareja de ventas, por turnos: clientes, ventas, pagos y reportes. Hoy trabajo en backend; mi compañera puede estar en frontend o en otra tarea, así que no toco archivos que ella tenga en curso.
+Solo puedes crear o modificar estos archivos de tecnifix-backend/: todo lo de clientes, ventas, pagos y reportes (routes, controllers, services, repositories, validators y sus pruebas).
+No toques nada fuera de esa lista. Si la tarea lo necesita, detente y dime qué pedirle y a quién.
+Respeta el contrato de docs/API.md y el formato de respuestas de AGENTS.md. No agregues dependencias.
+
+Tarea de hoy: [describe aquí la tarea]
+
+Antes de escribir código, dame un plan corto con los archivos que vas a tocar y espera mi confirmación.</pre></div><div class="prompt-card front-p"><div class="prompt-head"><span>Oscar</span><span class="cap-tag frontend">frontend</span><button type="button" class="copy" data-copy="prompt-4">Copiar</button></div><pre id="prompt-4">Trabajo en el proyecto TecniFix (repositorio Sistema_de_Gestion_de_Ventas).
+Antes de nada, lee AGENTS.md y síguelo. Si no puedes ver el repositorio, te lo pego a continuación.
+
+Soy Oscar, del equipo frontend. Mi parte: líder del frontend: base, diseño, login y usuarios.
+Solo puedes crear o modificar estos archivos de tecnifix-frontend/: src/app/layout.js, src/app/page.js, src/app/robots.js, src/app/(publico)/login/, src/app/(panel)/layout.js, src/app/(panel)/usuarios/, src/components/ui/, src/components/layout/, src/context/, src/hooks/, src/lib/, los services auth y usuarios, tecnifix-frontend/package.json y la configuración de Tailwind.
+No toques nada fuera de esa lista. Si la tarea lo necesita, detente y dime qué pedirle y a quién.
+Respeta el contrato de docs/API.md y el formato de respuestas de AGENTS.md. No agregues dependencias.
+
+Tarea de hoy: [describe aquí la tarea]
+
+Antes de escribir código, dame un plan corto con los archivos que vas a tocar y espera mi confirmación.</pre></div><div class="prompt-card front-p"><div class="prompt-head"><span>Gabriel</span><span class="cap-tag frontend">frontend</span><button type="button" class="copy" data-copy="prompt-5">Copiar</button></div><pre id="prompt-5">Trabajo en el proyecto TecniFix (repositorio Sistema_de_Gestion_de_Ventas).
+Antes de nada, lee AGENTS.md y síguelo. Si no puedes ver el repositorio, te lo pego a continuación.
+
+Soy Gabriel, del equipo frontend. Mi parte: pantallas de inventario.
+Solo puedes crear o modificar estos archivos de tecnifix-frontend/: src/app/(panel)/productos/, src/app/(panel)/categorias/, src/app/(panel)/proveedores/, src/app/(panel)/compras/, src/components/inventario/ y los services productos, categorias, proveedores y compras.
+No toques nada fuera de esa lista. Si la tarea lo necesita, detente y dime qué pedirle y a quién.
+Respeta el contrato de docs/API.md y el formato de respuestas de AGENTS.md. No agregues dependencias.
+
+Tarea de hoy: [describe aquí la tarea]
+
+Antes de escribir código, dame un plan corto con los archivos que vas a tocar y espera mi confirmación.</pre></div><div class="prompt-card front-p"><div class="prompt-head"><span>Jacqueline o Chinchaiguara</span><span class="cap-tag frontend">frontend</span><button type="button" class="copy" data-copy="prompt-6">Copiar</button></div><pre id="prompt-6">Trabajo en el proyecto TecniFix (repositorio Sistema_de_Gestion_de_Ventas).
+Antes de nada, lee AGENTS.md y síguelo. Si no puedes ver el repositorio, te lo pego a continuación.
+
+Soy [Jacqueline o Chinchaiguara], del equipo frontend. Mi parte: pareja de ventas, por turnos: clientes, caja, boleta, pagos y dashboard. Hoy trabajo en frontend; mi compañera puede estar en backend o en otra tarea, así que no toco archivos que ella tenga en curso.
+Solo puedes crear o modificar estos archivos de tecnifix-frontend/: src/app/(panel)/clientes/, src/app/(panel)/ventas/, src/app/(panel)/dashboard/, src/app/(panel)/reportes/, src/components/clientes/, src/components/ventas/, src/components/dashboard/ y los services clientes, ventas, pagos y reportes.
+No toques nada fuera de esa lista. Si la tarea lo necesita, detente y dime qué pedirle y a quién.
+Respeta el contrato de docs/API.md y el formato de respuestas de AGENTS.md. No agregues dependencias.
+
+Tarea de hoy: [describe aquí la tarea]
+
+Antes de escribir código, dame un plan corto con los archivos que vas a tocar y espera mi confirmación.</pre></div>
+    </div>
+
+    <div class="two">
+      <div class="prompt-card "><div class="prompt-head"><span>Plantilla para pedir una tarea</span><button type="button" class="copy" data-copy="prompt-tarea">Copiar</button></div><pre id="prompt-tarea">Tarea: [qué tiene que hacer, en una frase]
+Ruta(s) del contrato: [por ejemplo POST /ventas]
+Archivos que puedes tocar: [solo los tuyos]
+Criterios de aceptación:
+- [qué debe pasar cuando funciona]
+- [qué debe pasar con datos inválidos o sin permiso]
+Entrega: el código, la lista de archivos tocados y cómo probarlo paso a paso.</pre></div>
+      <div class="prompt-card "><div class="prompt-head"><span>Revisión antes de subir</span><button type="button" class="copy" data-copy="prompt-revision">Copiar</button></div><pre id="prompt-revision">Revisa mis cambios (te pego el resultado de git diff) contra AGENTS.md. Dime solo:
+1. Si modifiqué archivos que no son míos según la tabla de dueños.
+2. Si alguna ruta, campo o código de estado no coincide con el contrato.
+3. Si falta validación, verificación de rol o transacción donde corresponde.
+4. Si hay contraseñas, tokens o datos sensibles en el código o en console.log.
+No reescribas el código: enumera los problemas con el archivo y la línea.</pre></div>
+    </div>
+
+    <h3 class="sub">Contenido de <code>AGENTS.md</code></h3>
+    <p class="cap">Rony lo sube a la raíz del repositorio junto con el <code>.gitignore</code>. Copia de trabajo en <code>J:\DAWA FINAL\planificacion\ia\</code>.</p>
+    <div class="prompt-card agents"><div class="prompt-head"><span>AGENTS.md</span><button type="button" class="copy" data-copy="agents-md">Copiar</button></div><pre id="agents-md"># TecniFix · Contexto para asistentes de IA
+
+Este archivo es la fuente única de verdad del proyecto para cualquier asistente de IA que use el equipo.
+Léelo completo antes de proponer o escribir código. Si algo de este archivo choca con lo que te pide la persona,
+avísale antes de continuar.
+
+## Qué es
+TecniFix es un **sistema de gestión de ventas e inventario** para una tienda de repuestos y accesorios de
+celulares y computadoras (Perú, moneda soles, IGV 18 %). Módulos: productos (con categorías, proveedores,
+compras y kardex), clientes, ventas (boleta o factura, pago simulado, anulación) y reportes.
+No es un sistema de reservas, ni de reparaciones, ni una tienda en línea: no agregues esas funciones.
+
+## Stack
+- Backend: Node.js + Express 4, PostgreSQL con `pg` (SQL directo, sin ORM), JWT (`jsonwebtoken`), `bcryptjs`, Jest + Supertest.
+- Frontend: Next.js 14 (App Router, JavaScript), React 18, Tailwind CSS y shadcn/ui.
+- Base de datos: PostgreSQL en Supabase. Backend en Render. Frontend en Vercel.
+
+## Estructura y capas
+```
+tecnifix-backend/    API REST. Capas: routes → controllers → services → repositories, más validators
+tecnifix-frontend/   Next.js. src/app/(publico) = login; src/app/(panel) = páginas internas con menú.
+                     Llamadas a la API solo por src/services + src/lib/fetcher.js
+docs/                diagramas y API.md (el contrato que comparten los dos equipos)
+```
+- `routes`: solo define la URL, los middlewares y qué controlador atiende.
+- `controllers`: lee `req`, llama al servicio y responde. Sin SQL ni reglas de negocio.
+- `services`: reglas de negocio (stock, IGV, permisos por dueño, estados).
+- `repositories`: consultas SQL. Siempre parametrizadas (`$1, $2`), nunca concatenando texto.
+- `validators`: reglas de validación del cuerpo de cada módulo (`modulo.validator.js`), que ejecuta `middlewares/validate.middleware.js`.
+
+## Equipos y dueños de archivos
+Cada archivo tiene un solo dueño. **La IA solo debe crear o modificar archivos del dueño que le pidió ayuda.**
+
+| Persona | Capa | Archivos |
+|---|---|---|
+| Rony (líder backend) | backend | `src/app.js`, `src/server.js`, `src/routes/index.js`, `src/config/`, `src/middlewares/`, `src/utils/`, `src/database/`, todo lo de `auth` y `usuarios`, `tecnifix-backend/package.json`, `.github/`, `README.md` |
+| Jerónimo | backend | todo lo de `productos`, `categorias`, `proveedores`, `compras`, `inventario`; `src/services/correo.service.js` |
+| Jacqueline y Chinchaiguara (pareja de ventas, backend) | backend | todo lo de `clientes`, `ventas`, `pagos`, `reportes` |
+| Oscar (líder frontend) | frontend | `src/app/layout.js`, `src/app/page.js`, `src/app/robots.js`, `src/app/(publico)/login/`, `src/app/(panel)/layout.js`, `src/app/(panel)/usuarios/`; `src/components/ui/`, `layout/`; `src/context/`, `src/hooks/`, `src/lib/`; services `auth`, `usuarios`; `tecnifix-frontend/package.json`, configuración de Tailwind |
+| Gabriel | frontend | `src/app/(panel)/productos/`, `categorias/`, `proveedores/`, `compras/`; `src/components/inventario/`; services `productos`, `categorias`, `proveedores`, `compras` |
+| Jacqueline y Chinchaiguara (pareja de ventas, frontend) | frontend | `src/app/(panel)/clientes/`, `ventas/`, `dashboard/`, `reportes/`; `src/components/clientes/`, `ventas/`, `dashboard/`; services `clientes`, `ventas`, `pagos`, `reportes` |
+
+Jacqueline y Chinchaiguara son la **pareja de ventas**: el módulo es de las dos en las dos capas y se turnan.
+Si te pide ayuda una de ellas, **pregúntale en qué capa trabaja hoy** y limita los cambios a esa capa.
+No toques un archivo que su compañera tenga en curso.
+
+&quot;Todo lo de `productos`&quot; = `routes/productos.routes.js`, `controllers/productos.controller.js`,
+`services/productos.service.js`, `repositories/productos.repository.js`, `validators/productos.validator.js` y sus pruebas.
+
+## Reglas obligatorias para la IA
+1. Modifica solo los archivos de la persona que te pide ayuda. Si la tarea necesita otro archivo, **detente** y di a quién hay que pedírselo.
+2. Backend no toca `tecnifix-frontend/` y frontend no toca `tecnifix-backend/`.
+3. Respeta `docs/API.md`. No inventes rutas, campos ni formatos. Si falta algo, propón el cambio para que se pida en un issue.
+4. No agregues dependencias. Si una hace falta, dilo: la instala el líder de la capa (Rony u Oscar).
+5. No edites migraciones que ya existen. Los cambios de base de datos van en un archivo nuevo numerado (`003_algo.sql`), y solo Rony los une.
+6. No crees, leas ni pidas archivos `.env` reales, contraseñas ni tokens. Usa `.env.example` y `process.env`.
+7. Nombres en español. JavaScript en camelCase, tablas y columnas SQL en snake_case.
+8. Las rutas de la API no llevan prefijo `/api/` (ejemplo: `/productos/:id`).
+9. Explica el código que entregas: la persona tiene que poder defenderlo en la presentación.
+
+## Reglas del backend
+- Toda ruta, salvo `POST /auth/login`, usa `verificarToken` y `verificarRol(...roles)`.
+- Valida siempre en el servidor, aunque el frontend ya valide.
+- Ventas, anulaciones, compras y ajustes de stock van en **una transacción** (`BEGIN` / `COMMIT` / `ROLLBACK`). Al descontar stock usa `SELECT ... FOR UPDATE`.
+- Los precios y el IGV se calculan en el servidor con los datos de la base, nunca con los que manda el navegador.
+- Cada movimiento de stock inserta una fila en `movimientos_inventario`.
+- Errores: `next(error)` hacia el manejador central, con `error.status`. Nunca registres contraseñas ni tokens en `console.log`.
+- Cada servicio nuevo lleva al menos una prueba en `tests/`.
+
+## Reglas del frontend
+- Llamadas a la API solo desde `src/services/*.service.js`, que usan `apiFetch` de `src/lib/fetcher.js`. Nada de `fetch` directo en páginas ni componentes.
+- Usa los componentes de `src/components/ui/` (shadcn/ui) y Tailwind. No crees otro sistema de estilos.
+- Valida los formularios en el navegador y muestra los errores por campo que devuelve la API (`campos`).
+- Oculta en el menú y protege las páginas que el rol no puede usar.
+- SSR para listados, dashboard y reportes; componentes de cliente (`&quot;use client&quot;`) para la caja y los formularios.
+- Mientras una ruta no exista en el backend, usa datos de prueba en `src/mocks/&lt;modulo&gt;.mock.js` (cada uno el de su módulo) con la misma forma del contrato.
+- Páginas internas dentro de `src/app/(panel)/`; el login en `src/app/(publico)/login/`. Los paréntesis no aparecen en la URL.
+- Textos de la interfaz en español.
+
+## Roles
+`admin`, `vendedor`, `almacenero`. No existe rol de cliente: los clientes de la tienda no entran al sistema.
+- admin: todo; único que crea usuarios, cambia precios, ajusta stock y anula ventas.
+- vendedor: clientes, ventas y cobros; ve productos y stock; reportes solo de sus ventas.
+- almacenero: productos (sin precios), categorías, proveedores, compras y kardex.
+
+## Modelo de datos (PostgreSQL)
+- `usuarios` (id, nombre, email UQ, password_hash, rol, intentos_fallidos, bloqueado_hasta, activo, creado_en)
+- `clientes` (id, tipo_documento DNI|RUC, documento UQ, nombre, telefono, email, direccion)
+- `categorias` (id, nombre UQ)
+- `proveedores` (id, ruc UQ, razon_social, telefono)
+- `productos` (id, sku UQ, nombre, categoria_id → categorias, precio_compra, precio_venta, stock, stock_minimo, activo)
+- `compras` (id, proveedor_id → proveedores, usuario_id → usuarios, total, fecha)
+- `compra_detalle` (id, compra_id → compras, producto_id → productos, cantidad, costo_unitario)
+- `ventas` (id, serie_numero UQ ej. B001-000142, cliente_id → clientes, vendedor_id → usuarios, tipo_comprobante boleta|factura, subtotal, igv, total, estado pagada|anulada, fecha)
+- `venta_detalle` (id, venta_id → ventas, producto_id → productos, cantidad, precio_unitario, subtotal)
+- `movimientos_inventario` (id, producto_id → productos, tipo entrada|salida|ajuste, cantidad, stock_resultante, referencia venta|compra, usuario_id → usuarios, fecha)
+- `pagos` (id, venta_id → ventas, monto, metodo efectivo|tarjeta|yape, estado, referencia)
+
+## Formato de respuestas
+- Éxito: el objeto directamente. Listados: `{ &quot;data&quot;: [...], &quot;total&quot;: 87, &quot;pagina&quot;: 1, &quot;limite&quot;: 10 }` con `?pagina=&amp;limite=&amp;buscar=`.
+- Error: `{ &quot;error&quot;: &quot;mensaje&quot; }`. Validación: `{ &quot;error&quot;: &quot;Datos inválidos&quot;, &quot;campos&quot;: { &quot;documento&quot;: &quot;El DNI debe tener 8 dígitos&quot; } }`.
+- Códigos: 200, 201, 400 datos inválidos, 401 sin sesión, 403 rol sin permiso, 404 no existe, 409 stock insuficiente o venta ya anulada, 423 cuenta bloqueada.
+
+## Rutas del contrato
+`POST /auth/login` · `/usuarios` · `/categorias` · `/proveedores` · `/productos?buscar=&amp;categoria=&amp;stockBajo=` ·
+`/productos/:id` · `/productos/:id/movimientos` · `/compras` · `/inventario/ajustes` · `/clientes?buscar=` ·
+`/clientes/:id` · `/clientes/:id/ventas` · `/ventas` · `/ventas/:id` · `PATCH /ventas/:id/anular` ·
+`POST /pagos/simular` · `/reportes/resumen?desde=&amp;hasta=` · `/reportes/productos-mas-vendidos`.
+El detalle de cada una (cuerpo, respuesta y roles) está en `docs/API.md`.
+
+## Git y commits
+- La IA **no** hace commits ni push. Propone los cambios; la persona los revisa y los sube.
+- El equipo trabaja **directo en `main`**, sin ramas. No propongas crear ramas ni Pull Requests. Nunca `push --force`.
+- Commits en español, en primera persona y con prefijo: `feat: agrego el listado de productos con paginación`. Prefijos: `feat:`, `fix:`, `test:`, `docs:`, `refactor:`.
+- Un commit por cambio lógico. No mezcles en un commit cosas de módulos distintos.
+- **Sin rastros de IA**: nada de líneas `Co-Authored-By` de asistentes, ni &quot;generado con&quot;, ni menciones a herramientas de IA en commits, comentarios del código, README o Pull Requests.
+- Archivos por nombre (`git add tecnifix-backend/src/services/ventas.service.js`), nunca `git add .` ni `git add -A`.
+- Nunca se suben: `.env` (solo `.env.example`), `node_modules/`, `.next/`, `.vercel/`, `coverage/`, documentos de entrega (`.docx`, `.pdf`, `.pptx`), notas personales, archivos locales de IA, logs ni copias de la base de datos.
+- Antes de cada commit y de cada push: `git pull --rebase origin main`, pruebas en verde y `git diff --staged` revisado. Al subir, la persona avisa en Discord.
+
+## Cómo verificar
+- Backend: `cd tecnifix-backend &amp;&amp; npm test` y `npm run dev` (puerto 4000).
+- Frontend: `cd tecnifix-frontend &amp;&amp; npm run lint &amp;&amp; npm run build`, y `npm run dev` (puerto 3000).
+
+## Lo que la IA entrega al terminar
+1. La lista de archivos creados o modificados (todos deben ser de la persona que pidió ayuda).
+2. Cómo probarlo, paso a paso.
+3. Qué quedó pendiente o qué hay que pedirle a otro integrante.
+</pre></div>
+  </section>
+
+  <section aria-labelledby="s-curso">
+    <div class="section-head">
+      <span class="eyebrow">Lo aprendido en el curso</span>
+      <h2 id="s-curso">Qué semana se aplica dónde</h2>
+    </div>
+    <div class="table-wrap">
+      <table class="weeks">
+        <thead><tr><th>Semana</th><th>Tema</th><th>Dónde se aplica en TecniFix</th><th>Quién</th></tr></thead>
+        <tbody>
+          <tr><td>4</td><td>Express: rutas y controladores</td><td>Backend por capas: rutas, controladores, servicios y repositorios</td><td>Equipo backend</td></tr>
+          <tr><td>5</td><td>API REST, errores, paginación y correos</td><td>Manejador de errores único, listados paginados y correo al administrador cuando un producto llega a su stock mínimo</td><td>Rony, Jerónimo</td></tr>
+          <tr><td>6</td><td>MongoDB</td><td>No se usa: se justifica por qué PostgreSQL encaja mejor</td><td>Rony (justificación)</td></tr>
+          <tr><td>7</td><td>JWT, roles y validación</td><td>Login con JWT, tres roles y validación en el navegador y en el servidor</td><td>Rony, Jerónimo, la pareja de ventas y el equipo frontend</td></tr>
+          <tr><td>8</td><td>Despliegue y CI/CD</td><td>Render, Supabase, Vercel y pruebas en GitHub Actions</td><td>Rony, Oscar</td></tr>
+          <tr><td>9</td><td>CSR y SSR</td><td>SSR en listados, dashboard y reportes; CSR en la caja, donde el carrito cambia en cada clic</td><td>Equipo frontend</td></tr>
+          <tr><td>10</td><td>Rutas dinámicas</td><td><code>/productos/[id]</code>, <code>/clientes/[id]</code> y <code>/ventas/[id]</code></td><td>Equipo frontend</td></tr>
+          <tr><td>11</td><td>Tailwind y shadcn/ui</td><td>Diseño de toda la interfaz con componentes propios de TecniFix</td><td>Oscar y equipo frontend</td></tr>
+          <tr><td>12</td><td>Supabase y Prisma</td><td>PostgreSQL en Supabase. Prisma queda opcional: el repositorio ya usa SQL directo con <code>pg</code></td><td>Rony, Jerónimo</td></tr>
+          <tr><td>13</td><td>bcrypt y bloqueo por intentos</td><td>Contraseñas cifradas y bloqueo de 15 minutos tras 5 intentos fallidos</td><td>Rony</td></tr>
+          <tr><td>14</td><td>SEO, metadata y robots</td><td>Metadata por página; robots que no deja indexar el panel interno</td><td>Oscar</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-inicio">
+    <div class="section-head">
+      <span class="eyebrow">Cómo empezar</span>
+      <h2 id="s-inicio">Primeros pasos, en orden</h2>
+    </div>
+    <ol class="steps">
+      <li><div><b>Acordar este plan y el contrato de la API</b> entre los 6. Desde ahí cada equipo puede avanzar sin esperar al otro.</div></li>
+      <li><div><b>Rony agrega a los 5 como colaboradores</b>, sube <code>AGENTS.md</code>, el <code>.gitignore</code> y <code>CODEOWNERS</code>, protege <code>main</code> y conecta el repositorio con Discord. Desde ese momento todas las IA trabajan con el mismo contexto y todos ven los avisos.</div></li>
+      <li><div><b>Base de cada capa, en paralelo.</b> Rony: migración con las 11 tablas, <code>verificarRol</code>, formato de respuestas y Supabase. Oscar: Tailwind, shadcn/ui y el layout de <code>(panel)</code> con menú por rol; cada uno arma sus datos de prueba en <code>mocks/</code>.</div></li>
+      <li><div><b>Cada uno, su módulo.</b> En backend, rutas con sus pruebas. En frontend, pantallas que primero usan los datos de prueba.</div></li>
+      <li><div><b>Subir a <code>main</code> y avisar.</b> <code>git pull --rebase</code>, pruebas en verde, push y aviso en <code>#tecnifix-avisos</code>. GitHub Actions corre las pruebas en cada push.</div></li>
+      <li><div><b>Conectar de verdad.</b> Cuando una ruta está en <code>main</code> y desplegada en Render, su pareja de frontend deja los datos de prueba y usa la API real.</div></li>
+      <li><div><b>Prueba completa entre los 6:</b> una compra, varias ventas, una anulación y los reportes con cada rol, y luego el ensayo de la presentación.</div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="s-fases">
+    <div class="section-head">
+      <span class="eyebrow">Plan de trabajo</span>
+      <h2 id="s-fases">Fases</h2>
+      <p>Repartan las fases según la fecha de entrega que les dio el profesor.</p>
+    </div>
+    <div class="phase">
+      <article><span class="k">Fase 1 · Base</span><ul><li>Contrato de la API acordado</li><li>Backend: tablas, roles y formato</li><li>Frontend: diseño, layout y datos de prueba</li><li>Despliegue vacío en Render y Vercel</li></ul></article>
+      <article><span class="k">Fase 2 · Módulos</span><ul><li>Cada uno su módulo, subiendo a main</li><li>Backend con pruebas</li><li>Frontend con datos de prueba</li><li>Commits pequeños y avisados</li></ul></article>
+      <article><span class="k">Fase 3 · Integración</span><ul><li>Frontend conectado a la API real</li><li>Flujo completo: compra, venta, anulación</li><li>Dashboard con datos reales</li><li>Despliegue final</li></ul></article>
+      <article><span class="k">Fase 4 · Presentación</span><ul><li>Diapositivas y diagramas</li><li>Guion de la demostración</li><li>Ensayo con tiempos</li></ul></article>
+    </div>
+  </section>
+
+  <section aria-labelledby="s-pres">
+    <div class="section-head">
+      <span class="eyebrow">Lo que pide el profesor</span>
+      <h2 id="s-pres">Contenido de la presentación</h2>
+    </div>
+    <div class="table-wrap">
+      <table class="checklist">
+        <thead><tr><th>Punto</th><th>Requisito</th><th>Cómo lo cumple TecniFix</th><th>Responsable</th></tr></thead>
+        <tbody>
+          <tr><td>Idea</td><td>a. Sistema de gestión de ventas o inventario</td><td>Productos, clientes, ventas y reportes, más compras y kardex</td><td>Todos</td></tr>
+          <tr><td>A.1</td><td>Aplicación desplegada en la nube</td><td>Next.js en Vercel, Express en Render, PostgreSQL en Supabase</td><td>Rony y Oscar</td></tr>
+          <tr><td>A.2</td><td>Autenticación y seguridad: usuarios y roles</td><td>JWT, bcrypt, bloqueo por intentos, tres roles verificados en cada ruta, CORS</td><td>Rony</td></tr>
+          <tr><td>A.3</td><td>Variables de entorno y buenas prácticas</td><td><code>.env</code> fuera del repositorio, capas, validación en cliente y servidor, carpetas por capa con un dueño por archivo y contexto común para la IA (<code>AGENTS.md</code>)</td><td>Rony y Oscar</td></tr>
+          <tr><td>B.1</td><td>Modelo E-R</td><td>Diagrama de las 11 tablas</td><td>Jerónimo, Jacqueline y Chinchaiguara</td></tr>
+          <tr><td>B.2</td><td>Diagrama de arquitectura</td><td>Diagrama cliente-servidor</td><td>Oscar</td></tr>
+          <tr><td>B.3</td><td>Justificación tecnológica</td><td>Por qué relacional (transacciones de venta y stock) y por qué Next.js + Express</td><td>Rony</td></tr>
+          <tr><td>C.1</td><td>Demostración en vivo</td><td>Compra al proveedor → sube el stock → venta en caja con boleta → baja el stock → dashboard; luego una anulación</td><td>Gabriel, Jacqueline y Chinchaiguara, con todos</td></tr>
+          <tr><td>C.2</td><td>Flujo cliente-servidor</td><td>Recorrido de la petición de una venta: el lado de Next.js y el lado de Express</td><td>Oscar (lado Next.js) y la pareja de ventas (lado Express)</td></tr>
+          <tr><td>C.3</td><td>Desafíos y soluciones</td><td>Cada uno aporta uno real de su parte</td><td>Todos</td></tr>
+          <tr><td>Opcional</td><td>Pasarela de pagos y gráficos</td><td>Pago simulado en la caja y dashboard con gráficos</td><td>Jacqueline y Chinchaiguara</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Repositorio del grupo: <a href="https://github.com/Rony10-az/Sistema_de_Gestion_de_Ventas">github.com/Rony10-az/Sistema_de_Gestion_de_Ventas</a> · Base actual: Express por capas, PostgreSQL, JWT y Next.js con productos, clientes y ventas.
+  </footer>
+</div>
+
+<script>
+document.querySelectorAll('button.copy').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var pre = document.getElementById(btn.getAttribute('data-copy'));
+    var texto = pre.textContent;
+    function listo(msg) { btn.textContent = msg; setTimeout(function () { btn.textContent = 'Copiar'; }, 1800); }
+    function seleccionar() {
+      var r = document.createRange(); r.selectNodeContents(pre);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      listo('Selecciona y copia');
+    }
+    try {
+      navigator.clipboard.writeText(texto).then(function () { listo('Copiado'); }, seleccionar);
+    } catch (e) { seleccionar(); }
+  });
+});
+</script>
+
+</body>
+</html>
