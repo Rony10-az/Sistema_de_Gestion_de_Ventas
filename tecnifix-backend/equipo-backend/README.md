@@ -53,8 +53,8 @@ Estas son las tablas que usan los módulos de inventario.
 | `movimientos_inventario` | `id`, `producto_id`, `tipo`, `cantidad`, `stock_resultante`, `referencia`, `motivo`, `usuario_id`, `fecha` |
 
 Qué cambia para el resto:
-- En `productos`, `precio` pasa a `precio_venta` y desaparece `descripcion`. Con las
-  tablas de `001_init.sql`, `/productos` falla: aplica la `002`.
+- En `productos`, `precio` pasa a `precio_venta`; la API ya no usa `descripcion` (la
+  columna se conserva). Con solo `001_init.sql`, `/productos` falla: aplica la `002`.
 - Productos exige sesión y los listados devuelven `{ data, total, pagina, limite }`.
 - `DELETE /productos/:id` desactiva el producto, no lo borra.
 - Las pruebas de integración de productos y compras necesitan esas tablas.
@@ -165,13 +165,14 @@ insuficiente o duplicado), 423 (cuenta bloqueada).
 
 Roles: `admin`, `vendedor`, `almacenero`. Rutas sin prefijo `/api/`.
 
-Este es el formato **acordado**; el código actual todavía devuelve listas simples y no
-comprueba roles.
+Este es el formato **acordado**. Los módulos de inventario ya paginan y comprueban
+roles; clientes y ventas todavía devuelven listas simples y no comprueban roles.
 
 ## 5. Estado actual
 
 **Listo:** conexión local, scripts de base de datos, Docker, pruebas, colección de Bruno,
-login básico y CRUD de productos y clientes.
+login básico, CRUD de clientes y el inventario completo (categorías, proveedores,
+productos, compras, ajustes, kardex y alerta de stock; ver `../README.md`).
 
 **Incompleto:** crear una venta guarda total 0, sin detalle ni descuento de stock. La base
 tiene las 11 tablas del modelo (`002_modelo_tecnifix.sql`).
@@ -190,8 +191,8 @@ En este orden, porque cada uno se apoya en el anterior:
 | 3 | Un usuario de prueba por rol y adaptar productos (`precio` → `precio_venta`) | Pruebas y Bruno en verde |
 | 4 | ~~`verificarRol`~~ (hecho). Falta: usuarios solo para admin y quitar `/auth/register` | Sin permiso responde 403 |
 | 5 | Errores 404/409, validación con `zod` y paginación | Todas las rutas usan el formato |
-| 6 | Categorías, proveedores y productos completos | Se registran desde la API |
-| 7 | Compras, ajustes y kardex, en transacción | Una compra sube el stock |
+| 6 | ~~Categorías, proveedores y productos completos~~ (hecho) | Se registran desde la API |
+| 7 | ~~Compras, ajustes y kardex, en transacción~~ (hecho) | Una compra sube el stock |
 | 8 | Clientes con DNI o RUC e historial | Se puede buscar por documento |
 | 9 | Ventas: stock, IGV, detalle, pago y kardex en **una sola transacción** | Sin stock responde 409 y no guarda nada |
 | 10 | Anulación y reportes | El stock vuelve y los reportes la ignoran |
