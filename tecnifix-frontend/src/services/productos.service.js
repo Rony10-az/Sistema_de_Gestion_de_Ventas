@@ -1,5 +1,5 @@
 // Llamadas al dominio /productos del backend. Espeja uno a uno las rutas
-// de backend/src/routes/productos.routes.js.
+// de tecnifix-backend/src/routes/productos.routes.js.
 
 import { apiFetch } from '../lib/fetcher';
 

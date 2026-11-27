@@ -28,11 +28,11 @@ productos, clientes, ventas). Se eligió así porque:
 
 ```
 Sistema_de_Gestion_de_Ventas/
-├── backend/     → API REST con Express (ver backend/README.md)
-└── frontend/    → Interfaz con Next.js (ver frontend/README.md)
+├── tecnifix-backend/     → API REST con Express (ver tecnifix-backend/README.md)
+└── tecnifix-frontend/    → Interfaz con Next.js (ver tecnifix-frontend/README.md)
 ```
 
-Cada carpeta (`backend/`, `frontend/`) es independiente: su propio `package.json`,
+Cada carpeta (`tecnifix-backend/`, `tecnifix-frontend/`) es independiente: su propio `package.json`,
 su propio `.env`, y se levanta por separado.
 
 ## Convención de rutas
@@ -51,19 +51,19 @@ dominio, con parámetros dinámicos donde corresponde:
 /ventas/:id
 ```
 
-El frontend consume esas mismas rutas vía `NEXT_PUBLIC_API_URL` (ver `frontend/.env.example`).
+El frontend consume esas mismas rutas vía `NEXT_PUBLIC_API_URL` (ver `tecnifix-frontend/.env.example`).
 
 ## Cómo levantar el proyecto
 
 ```bash
 # Backend
-cd Sistema_de_Gestion_de_Ventas/backend
+cd Sistema_de_Gestion_de_Ventas/tecnifix-backend
 cp .env.example .env
 npm install
 npm run dev
 
 # Frontend (en otra terminal)
-cd Sistema_de_Gestion_de_Ventas/frontend
+cd Sistema_de_Gestion_de_Ventas/tecnifix-frontend
 cp .env.example .env
 npm install
 npm run dev

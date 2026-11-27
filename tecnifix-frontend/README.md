@@ -1,6 +1,6 @@
 # Frontend — TecniFix (Next.js)
 
-Interfaz web que consume la API del backend (`Sistema_de_Gestion_de_Ventas/backend`). Usa el
+Interfaz web que consume la API del backend (`Sistema_de_Gestion_de_Ventas/tecnifix-backend`). Usa el
 **App Router** de Next.js.
 
 ## Estructura
