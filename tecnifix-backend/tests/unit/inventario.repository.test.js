@@ -2,9 +2,9 @@
 
 jest.mock('../../src/config/database', () => ({ connect: jest.fn() }));
 const pool = require('../../src/config/database');
-const { enTransaccion } = require('../../src/repositories/compras.repository');
+const { enTransaccion } = require('../../src/repositories/inventario.repository');
 
-describe('compras.repository · enTransaccion', () => {
+describe('inventario.repository · enTransaccion', () => {
   let client;
 
   beforeEach(() => {

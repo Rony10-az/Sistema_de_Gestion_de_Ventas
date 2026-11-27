@@ -1,6 +1,7 @@
 // Única capa que ejecuta SQL para las tablas "compras" y "compra_detalle".
 
 const pool = require('../config/database');
+const { enTransaccion } = require('./inventario.repository');
 
 const SELECCION = `
   SELECT c.id, c.proveedor_id, p.razon_social AS proveedor_nombre,
@@ -9,22 +10,6 @@ const SELECCION = `
   FROM compras c
   JOIN proveedores p ON p.id = c.proveedor_id
   JOIN usuarios u ON u.id = c.usuario_id`;
-
-// Ejecuta la operación en una sola transacción: se guarda todo o nada.
-async function enTransaccion(operacion) {
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    const resultado = await operacion(client);
-    await client.query('COMMIT');
-    return resultado;
-  } catch (error) {
-    await client.query('ROLLBACK');
-    throw error;
-  } finally {
-    client.release();
-  }
-}
 
 async function insertarCompra(client, { proveedor_id, usuario_id, total }) {
   const { rows } = await client.query(
