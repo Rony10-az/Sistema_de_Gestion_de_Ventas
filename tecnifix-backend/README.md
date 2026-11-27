@@ -20,7 +20,8 @@ response ← controller ← ← ← ← ← ← ┘
 | `validators/` | Reglas de validación de los datos de cada módulo (`modulo.validator.js`). | No consulta la base de datos. |
 | `middlewares/` | Funciones que se ejecutan antes del controlador: verificar JWT, manejar errores, validar body. | — |
 | `utils/` | Helpers reutilizables sin estado (firmar/verificar JWT, formatear respuestas). | — |
-| `database/migrations` | Scripts SQL que crean/alteran tablas. | — |
+| `database/tecnifix_local.sql` | Script completo para crear la base local. | — |
+| `database/migrations` | Historial de cambios de las tablas; lo usan las pruebas. | — |
 | `database/seeds` | Scripts SQL con datos de prueba. | — |
 
 ## Nombres de archivos
@@ -134,7 +135,8 @@ Los listados responden `{ data, total, pagina, limite }`.
 
 ### Tablas
 
-Se crean con `database/migrations/002_modelo_tecnifix.sql` (`npm run db:migrate`).
+Vienen en `database/tecnifix_local.sql`
+([cómo cargarlo](#base-de-datos-local-con-el-script)).
 
 | Tabla | Columnas |
 |---|---|
@@ -165,7 +167,7 @@ la API funciona igual.
 
 ### Cómo probarlo
 
-1. `npm run db:setup` y `npm run dev`.
+1. Cargar el script de la base local y `npm run dev`.
 2. En Bruno, abrir `bruno/`, elegir el entorno **local** e iniciar sesión.
 3. Ejecutar las carpetas `categorias`, `proveedores`, `productos`, `compras` e `inventario`.
 
@@ -182,28 +184,47 @@ Los cinco módulos tienen pruebas unitarias y de integración en `tests/`; el co
 
 ## Cómo correr
 
+Primero crea tu base local (siguiente sección). Luego:
+
 ```bash
 npm install
 npm run env:init          # crea .env; luego escribe tu DB_PASSWORD
-npm run db:setup          # crea la base, migra y carga datos de prueba
+npm run db:check          # prueba la conexión
 npm run dev               # nodemon, recarga automática
 ```
 
-## Base de datos
+## Base de datos local con el script
 
-| Script | Qué hace |
-|---|---|
-| `npm run db:check` | Prueba la conexión. |
-| `npm run db:create` | Crea la base local (`DB_NAME`) si no existe. |
-| `npm run db:migrate` | Aplica las migraciones pendientes de `src/database/migrations`. |
-| `npm run db:seed` | Carga los datos pendientes de `src/database/seeds`. |
-| `npm run db:setup` | `create` + `migrate` + `seed`. |
+Cada integrante tiene su propia base. [`src/database/tecnifix_local.sql`](src/database/tecnifix_local.sql)
+crea las 11 tablas y los datos de prueba de una sola vez: solo se jala con `git pull` y
+se carga. **No hay que ejecutar migraciones** (`db:migrate`, `db:setup`).
 
-Lo aplicado se anota en la tabla `schema_migrations`, así que se pueden repetir sin
-duplicar. Un cambio en la base es un archivo nuevo numerado (`002_...sql`). Si ya
-habías cargado `seed.sql` a mano, `db:seed` fallará por registros repetidos.
+Se carga sobre una base **vacía**. Los comandos van desde la carpeta principal del
+repositorio.
 
-Se usa PostgreSQL instalado en cada computadora; cada integrante tiene su propia base.
+**PostgreSQL instalado:**
+
+```bash
+createdb -U postgres sistema_ventas
+psql -U postgres -d sistema_ventas -f tecnifix-backend/src/database/tecnifix_local.sql
+```
+
+**pgAdmin:** crea la base `sistema_ventas`, abre *Query Tool* sobre ella, carga el
+archivo y ejecútalo completo.
+
+**Docker** (puerto 5434; en `tecnifix-backend/.env` usa `DB_PORT=5434` y la contraseña
+de `POSTGRES_PASSWORD`):
+
+```bash
+docker compose up -d db
+docker compose cp tecnifix-backend/src/database/tecnifix_local.sql db:/tmp/
+docker compose exec db psql -U postgres -d sistema_ventas -f /tmp/tecnifix_local.sql
+```
+
+**Si ya tenías una base con tablas**, el script se detiene sin cambiar nada. Crea otra
+base vacía (por ejemplo `tecnifix_local`), cárgalo ahí y pon ese nombre en `DB_NAME`.
+
+Quien cambie una tabla debe actualizar este script y avisar al grupo.
 
 ## Pruebas
 

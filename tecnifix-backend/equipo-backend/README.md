@@ -27,8 +27,8 @@ y antes de cada push.
 
 ## Inventario: últimos cambios
 
-Cada integrante de backend trabaja con su base en su entorno local, y todos la crean
-con las mismas migraciones: `npm run db:setup` aplica `002_modelo_tecnifix.sql`.
+Cada integrante trabaja con su base en su entorno local, y todos la crean con el mismo
+script, `src/database/tecnifix_local.sql`, sin ejecutar migraciones (ver `../README.md`).
 Estas son las tablas que usan los módulos de inventario.
 
 | Módulo | Rutas | Estado |
@@ -54,7 +54,8 @@ Estas son las tablas que usan los módulos de inventario.
 
 Qué cambia para el resto:
 - En `productos`, `precio` pasa a `precio_venta`; la API ya no usa `descripcion` (la
-  columna se conserva). Con solo `001_init.sql`, `/productos` falla: aplica la `002`.
+  columna se conserva). Con las tablas antiguas, `/productos` falla: carga el script en
+  una base vacía.
 - Productos exige sesión y los listados devuelven `{ data, total, pagina, limite }`.
 - `DELETE /productos/:id` desactiva el producto, no lo borra.
 - Las pruebas de integración de productos y compras necesitan esas tablas.
@@ -97,12 +98,12 @@ cantidad lleva signo: positiva si el stock sube y negativa si baja.
 
 ## 1. Ponerlo a funcionar
 
-Requisitos: Node 22, PostgreSQL 17 (o Docker Desktop) y Git. Desde `tecnifix-backend/`:
+Requisitos: Node 22, PostgreSQL 17 (o Docker Desktop) y Git. Primero carga el script de
+la base local (ver `../README.md`) y luego, desde `tecnifix-backend/`:
 
 ```powershell
 npm install
 npm run env:init      # crea .env; luego escribe tu DB_PASSWORD
-npm run db:setup      # crea la base, migra y carga datos de prueba
 npm run dev           # http://localhost:4000
 ```
 
@@ -148,7 +149,8 @@ Nombres: `modulo.capa.js` (ej. `ventas.service.js`).
 Está terminada cuando valida los datos, comprueba el rol, responde con el formato
 acordado, tiene pruebas y está documentada.
 
-Un cambio en la base es una migración nueva (`003_...sql` en adelante); no se edita una ya subida.
+Un cambio en la base se acuerda con el grupo y se refleja en
+`src/database/tecnifix_local.sql`.
 Los commits siguen la forma `tipo(backend): resumen`, con viñetas que expliquen los cambios.
 
 ## 4. Formato de respuestas
@@ -187,7 +189,7 @@ En este orden, porque cada uno se apoya en el anterior:
 | Paso | Qué hacer | Listo cuando |
 |---|---|---|
 | 1 | Escribir el contrato en `docs/API.md` | Backend y frontend lo aprueban |
-| 2 | ~~Migración `002` según `docs/modelo-er.png`~~ (hecha) | `npm run db:setup` crea las 11 tablas |
+| 2 | ~~Migración `002` según `docs/modelo-er.png`~~ (hecha) | El script `tecnifix_local.sql` crea las 11 tablas |
 | 3 | Un usuario de prueba por rol y adaptar productos (`precio` → `precio_venta`) | Pruebas y Bruno en verde |
 | 4 | ~~`verificarRol`~~ (hecho). Falta: usuarios solo para admin y quitar `/auth/register` | Sin permiso responde 403 |
 | 5 | Errores 404/409, validación con `zod` y paginación | Todas las rutas usan el formato |

@@ -86,22 +86,31 @@ El frontend consume la API vía `NEXT_PUBLIC_API_URL` (ver `tecnifix-frontend/.e
 
 ## Cómo levantar el proyecto
 
+Cada integrante usa su **propia base de datos local**. Se crea cargando un solo script,
+[`tecnifix_local.sql`](tecnifix-backend/src/database/tecnifix_local.sql): **no se
+ejecutan migraciones**.
+
 ```bash
+# Base de datos (una sola vez, con PostgreSQL instalado; desde la carpeta principal)
+createdb -U postgres sistema_ventas
+psql -U postgres -d sistema_ventas -f tecnifix-backend/src/database/tecnifix_local.sql
+
 # Backend
 cd Sistema_de_Gestion_de_Ventas/tecnifix-backend
 npm install
 npm run env:init     # luego escribe tu DB_PASSWORD en .env
-npm run db:setup
 npm run dev
 
 # Frontend (en otra terminal)
 cd Sistema_de_Gestion_de_Ventas/tecnifix-frontend
-cp .env.example .env.local
+cp .env.example .env.local   # NEXT_PUBLIC_USE_MOCKS=false para usar tu API local
 npm install
 npm run dev
 ```
 
-`db:setup` crea las 11 tablas del modelo y los datos de prueba, con un usuario por rol
+Con pgAdmin, Docker o una base anterior, ver
+[los pasos de la base local](tecnifix-backend/README.md#base-de-datos-local-con-el-script).
+El script crea las 11 tablas del modelo y los datos de prueba, con un usuario por rol
 (contraseña `tecnifix123`, solo para desarrollo local): `admin@tecnifix.pe`,
 `vendedor@tecnifix.pe` y `almacen@tecnifix.pe`.
 
@@ -120,8 +129,10 @@ docker compose up --build
 | Backend (Express) | `backend` | http://localhost:4000 |
 | Base de datos (PostgreSQL 17) | `db` | `localhost:5434` (cambiable con `POSTGRES_PORT`) |
 
-El backend aplica las migraciones y datos de prueba al arrancar. La base de Docker es
-distinta a la de tu PostgreSQL instalado y se conserva en el volumen `datos_db`.
+Antes del primer arranque, carga el script en la base de Docker
+([pasos](tecnifix-backend/README.md#base-de-datos-local-con-el-script)); así el backend
+no cambia nada al iniciar. La base de Docker es distinta a la de tu PostgreSQL instalado
+y se conserva en el volumen `datos_db`.
 
 - El frontend usa la API real. Para los datos de prueba: `NEXT_PUBLIC_USE_MOCKS=true`
   en `.env` y `docker compose up --build`.
