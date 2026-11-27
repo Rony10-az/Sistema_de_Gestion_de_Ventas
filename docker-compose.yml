@@ -32,6 +32,12 @@ services:
       DB_USER: postgres
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:?Falta JWT_SECRET en .env}
+      # Correo de stock mínimo (opcional): vacías, la API funciona sin enviar.
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      CORREO_ADMIN: ${CORREO_ADMIN:-}
     ports:
       - "127.0.0.1:4000:4000"
     depends_on:

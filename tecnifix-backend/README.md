@@ -185,11 +185,53 @@ Se crean con `database/migrations/002_modelo_tecnifix.sql` (`npm run db:migrate`
 Ejemplo de uso en [`equipo-backend/README.md`](equipo-backend/README.md#7-cómo-usa-ventas-el-inventario).
 El módulo de ventas todavía no las usa.
 
-### Correo (opcional)
+### Correo de stock mínimo (opcional)
 
-Se activa en `.env` con `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` y
-`CORREO_ADMIN` (ver `.env.example`). Sin `SMTP_HOST` o `CORREO_ADMIN` no se envía nada y
-la API funciona igual.
+Cuando un producto llega a su stock mínimo, el backend envía un correo al administrador.
+Usa **nodemailer**, que se conecta a un servidor de correo (SMTP) con los datos de tu
+`.env`. Sin `SMTP_HOST` o `CORREO_ADMIN` no se envía nada y la API funciona igual.
+
+**1. Prepara la cuenta que envía.** Con Gmail, activa la verificación en dos pasos y
+crea una [contraseña de aplicación](https://myaccount.google.com/apppasswords). No uses
+la contraseña de tu cuenta.
+
+**2. Completa las variables** en tu `.env` local:
+
+| Variable | Qué poner (ejemplo con Gmail) |
+|---|---|
+| `SMTP_HOST` | `smtp.gmail.com` |
+| `SMTP_PORT` | `587` (o `465`) |
+| `SMTP_USER` | El correo que envía |
+| `SMTP_PASSWORD` | La contraseña de aplicación, sin espacios |
+| `CORREO_ADMIN` | El correo que recibe la alerta |
+
+| Cómo ejecutas el backend | Archivo | Después de editarlo |
+|---|---|---|
+| `npm run dev` | `tecnifix-backend/.env` | Detén y vuelve a ejecutar `npm run dev` |
+| Docker | `.env` de la carpeta principal | `docker compose up -d --build backend` |
+
+Los `.env` no se suben a Git: cada integrante pone sus propios datos.
+
+**3. Provoca una alerta.** Inicia sesión como admin y ajusta el stock de un producto
+para que baje hasta su mínimo. Por ejemplo, si tiene stock 10 y mínimo 3
+(`GET /productos` muestra ambos y el `id`):
+
+```
+POST /inventario/ajustes
+{ "producto_id": 3, "cantidad": -7, "motivo": "Prueba de alerta" }
+```
+
+En Bruno es la petición `inventario / Ajustar stock`, cambiando esos valores.
+
+**Qué esperar:**
+
+- El correo llega con el asunto `Stock mínimo: <producto>`.
+- Se envía **una vez**, al pasar de estar sobre el mínimo a estar en él o debajo. Para
+  repetir la prueba, primero sube el stock con un ajuste positivo.
+- Si el envío falla, el ajuste se guarda igual y la consola muestra
+  `No se pudo enviar el correo`.
+- Hoy se activa con ajustes de stock; con las ventas se activará cuando usen
+  `registrarSalida` y `avisarStockBajo`.
 
 ### Cómo probarlo
 
@@ -208,7 +250,7 @@ Los cinco módulos tienen pruebas unitarias y de integración en `tests/`; el co
 - [x] Alerta de stock mínimo por correo (probada con envío simulado)
 - [x] Pruebas, colección de Bruno y contrato en `docs/API.md`
 - [ ] Probar el correo con un servidor SMTP real
-- [ ] Pasar las variables `SMTP_*` al backend en `docker-compose.yml`
+- [x] Variables `SMTP_*` disponibles en Docker (`docker-compose.yml`)
 
 Dependen de otras partes: que ventas use las funciones de stock y las pantallas de
 inventario en el frontend.

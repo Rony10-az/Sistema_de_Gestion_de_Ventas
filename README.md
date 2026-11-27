@@ -65,6 +65,10 @@ editar migraciones. Para usar la API real, pon `NEXT_PUBLIC_USE_MOCKS=false` en
 `tecnifix-frontend/.env.local`. Las rutas de inventario piden iniciar sesión y sus
 listados responden `{ data, total, pagina, limite }` (ver [`docs/API.md`](docs/API.md)).
 
+**Correo de stock mínimo (opcional):** para recibir la alerta, sigue
+[estos pasos](tecnifix-backend/README.md#correo-de-stock-mínimo-opcional). Sin
+configurarlo, todo lo demás funciona.
+
 ## Levantar con Docker
 
 Requiere Docker Desktop abierto. Desde la carpeta principal (PowerShell):
