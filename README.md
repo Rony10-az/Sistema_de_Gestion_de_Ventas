@@ -31,13 +31,13 @@ Actualizado al 27 de noviembre de 2026.
 
 | Módulo | Backend | Frontend | Responsables (backend · frontend) |
 |---|---|---|---|
-| Login y usuarios | Registro y login con JWT. Faltan usuarios por rol, `verificarRol` y bloqueo | Login y menú por rol; usuarios por hacer | Rony · Oscar |
+| Login y usuarios | Registro y login con JWT, permisos con `verificarRol`. Faltan la gestión de usuarios y el bloqueo | Login y menú por rol; usuarios por hacer | Rony · Oscar |
 | Categorías y proveedores | **Listo** | Por hacer | Jerónimo · Gabriel |
 | Productos | **Listo** | Páginas base | Jerónimo · Gabriel |
 | Compras, ajustes y kardex | **Listo** | Por hacer | Jerónimo · Gabriel |
 | Alerta de stock mínimo | **Listo** (correo opcional) | Por hacer | Jerónimo · Gabriel |
-| Clientes | CRUD básico | Listado, formulario y ficha con datos de prueba | Jacqueline y Chinchaiguara |
-| Ventas | Registro básico: sin total, detalle ni descuento de stock | Historial y comprobante con datos de prueba | Jacqueline y Chinchaiguara |
+| Clientes | CRUD básico, con permisos por rol | Listado, formulario y ficha con datos de prueba | Jacqueline y Chinchaiguara |
+| Ventas | Registro básico: sin total, detalle ni descuento de stock. Con permisos por rol | Historial y comprobante con datos de prueba | Jacqueline y Chinchaiguara |
 | Pagos y reportes | Por hacer | Por hacer | Jacqueline y Chinchaiguara |
 
 ### Inventario (backend)

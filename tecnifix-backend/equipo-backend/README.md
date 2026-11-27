@@ -8,7 +8,8 @@ tokens ni datos personales: todo el que tenga acceso al repositorio puede leerlo
 Detalle completo en [para-j-ortiz/README.md](para-j-ortiz/README.md).
 
 Se modificaron archivos del módulo de inventario. **Antes de seguir, ejecuta**
-`git pull origin main`, `npm install` y `npm run db:setup`.
+`git pull origin main`, `npm install` y carga `src/database/tecnifix_local.sql` en una
+base vacía (ver `../README.md`).
 
 | Archivo | Qué se hizo |
 |---|---|
@@ -167,8 +168,8 @@ insuficiente o duplicado), 423 (cuenta bloqueada).
 
 Roles: `admin`, `vendedor`, `almacenero`. Rutas sin prefijo `/api/`.
 
-Este es el formato **acordado**. Los módulos de inventario ya paginan y comprueban
-roles; clientes y ventas todavía devuelven listas simples y no comprueban roles.
+Este es el formato **acordado**. Los módulos de inventario, clientes y ventas ya
+comprueban roles; clientes y ventas todavía devuelven listas simples.
 
 ## 5. Estado actual
 

@@ -175,8 +175,6 @@ Los cinco módulos tienen pruebas unitarias y de integración en `tests/`; el co
 
 ### Pendiente fuera de este módulo
 
-- Las rutas usan un control de rol propio (`soloRoles`), repetido en cinco archivos; se
-  reemplaza por `verificarRol` cuando exista en `middlewares/`.
 - Un error inesperado del servidor responde 400 (`error.middleware.js`).
 - Faltan las pantallas de categorías, proveedores, compras y kardex en el frontend.
 - El envío real de correo no está comprobado con un servidor SMTP: las pruebas lo simulan.
