@@ -3,83 +3,61 @@
 @tailwind utilities;
 
 /*
-  Colores de TecniFix (formato HSL que espera tailwind.config.js).
-  Base gris azulada, acento naranja de herramienta y menú lateral oscuro.
-  Para cambiar un color de toda la app se cambia aquí, no en los componentes.
+  Tema de TecniFix (inspirado en hodl.swiss): fondo negro, acento magenta → violeta,
+  títulos en Outfit y textos en Nunito Sans. Todo el color sale de estas variables
+  (formato HSL que espera tailwind.config.js): para cambiar un color de la app se cambia aquí.
 */
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 215 28% 12%;
-    --card: 0 0% 100%;
-    --card-foreground: 215 28% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 28% 12%;
-    --primary: 20 80% 40%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 16% 93%;
-    --secondary-foreground: 215 28% 17%;
-    --muted: 210 16% 94%;
-    --muted-foreground: 215 14% 38%;
-    --accent: 24 90% 95%;
-    --accent-foreground: 20 80% 30%;
-    --destructive: 0 72% 45%;
-    --destructive-foreground: 0 0% 100%;
-    --success: 152 60% 32%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 42%;
-    --warning-foreground: 0 0% 100%;
-    --border: 214 20% 88%;
-    --input: 214 20% 84%;
-    --ring: 20 80% 40%;
-    --chart-1: 20 80% 45%;
-    --chart-2: 173 58% 33%;
-    --chart-3: 221 60% 45%;
-    --chart-4: 43 90% 50%;
-    --chart-5: 280 40% 50%;
-    --radius: 0.5rem;
-    --sidebar: 215 30% 14%;
-    --sidebar-foreground: 210 20% 90%;
-    --sidebar-primary: 22 85% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 25% 21%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 215 22% 22%;
-    --sidebar-ring: 22 85% 55%;
-  }
+    color-scheme: dark;
 
-  .dark {
-    --background: 215 30% 9%;
-    --foreground: 210 20% 92%;
-    --card: 215 28% 12%;
-    --card-foreground: 210 20% 92%;
-    --popover: 215 28% 12%;
-    --popover-foreground: 210 20% 92%;
-    --primary: 22 85% 55%;
-    --primary-foreground: 215 30% 9%;
-    --secondary: 215 22% 18%;
-    --secondary-foreground: 210 20% 92%;
-    --muted: 215 22% 18%;
-    --muted-foreground: 215 14% 65%;
-    --accent: 20 40% 18%;
-    --accent-foreground: 24 90% 80%;
-    --destructive: 0 65% 55%;
+    --background: 270 20% 3%;
+    --foreground: 240 20% 97%;
+    --card: 270 16% 6%;
+    --card-foreground: 240 20% 97%;
+    --popover: 270 16% 7%;
+    --popover-foreground: 240 20% 97%;
+
+    /* Degradado de marca: #b51ec0 → #8e2bc4 */
+    --primary: 296 73% 44%;
+    --primary-2: 279 64% 47%;
+    --primary-foreground: 0 0% 100%;
+    --brillo: 296 74% 50%;
+
+    --secondary: 270 12% 12%;
+    --secondary-foreground: 240 20% 97%;
+    --muted: 270 12% 10%;
+    --muted-foreground: 260 9% 66%;
+    --accent: 292 40% 13%;
+    --accent-foreground: 296 85% 78%;
+
+    --destructive: 350 75% 56%;
     --destructive-foreground: 0 0% 100%;
-    --success: 152 50% 45%;
+    --success: 152 55% 46%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 55%;
-    --warning-foreground: 215 30% 9%;
-    --border: 215 20% 22%;
-    --input: 215 20% 25%;
-    --ring: 22 85% 55%;
-    --sidebar: 215 32% 7%;
-    --sidebar-foreground: 210 20% 90%;
-    --sidebar-primary: 22 85% 55%;
+    --warning: 38 92% 56%;
+    --warning-foreground: 270 20% 3%;
+
+    --border: 270 14% 16%;
+    --input: 270 14% 19%;
+    --ring: 296 80% 62%;
+
+    --chart-1: 296 73% 56%;
+    --chart-2: 279 64% 62%;
+    --chart-3: 199 80% 56%;
+    --chart-4: 38 92% 56%;
+    --chart-5: 152 55% 46%;
+
+    --radius: 0.9rem;
+
+    --sidebar: 270 25% 2%;
+    --sidebar-foreground: 240 10% 86%;
+    --sidebar-primary: 296 73% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 25% 16%;
+    --sidebar-accent: 270 16% 9%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 215 22% 16%;
-    --sidebar-ring: 22 85% 55%;
+    --sidebar-border: 270 14% 11%;
+    --sidebar-ring: 296 80% 62%;
   }
 }
 
@@ -87,7 +65,203 @@
   * {
     @apply border-border;
   }
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background font-sans text-foreground;
+  }
+  h1, h2, h3 {
+    @apply font-display tracking-tight;
+  }
+  ::selection {
+    background: hsl(var(--primary) / 0.45);
+  }
+}
+
+@layer components {
+  /* Resplandor morado de fondo, fijo y sin eventos (no se repinta al hacer scroll) */
+  .fondo-resplandor::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(40rem 28rem at 85% -10%, hsl(var(--primary) / 0.16), transparent 70%),
+      radial-gradient(36rem 30rem at -10% 110%, hsl(var(--primary-2) / 0.12), transparent 70%);
+  }
+
+  /* Fondo con el degradado de la marca */
+  .degradado-marca {
+    background-image: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-2)) 100%);
+  }
+
+  /* Texto con el degradado de la marca, para resaltar parte de un título */
+  .texto-marca {
+    background-image: linear-gradient(135deg, hsl(296 85% 66%) 0%, hsl(279 75% 70%) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Etiqueta pequeña en monoespaciada, como "01 — INVENTARIO" */
+  .etiqueta {
+    @apply font-mono text-[0.72rem] font-medium uppercase tracking-[0.18em] text-muted-foreground;
+  }
+
+  /* Superficie de vidrio oscuro con borde interior de luz */
+  .vidrio {
+    @apply border border-white/10 bg-card/70 backdrop-blur-md;
+    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.05);
+  }
+
+  /* Línea de guiones animada debajo de los títulos grandes */
+  .linea-guiones {
+    height: 2px;
+    width: 11rem;
+    background-image: linear-gradient(90deg, hsl(var(--primary)) 50%, transparent 50%);
+    background-size: 14px 2px;
+    animation: guiones 1.6s linear infinite;
+    opacity: 0.7;
+  }
+
+  /* Cinta de texto que se desplaza sin fin */
+  .cinta {
+    display: flex;
+    width: max-content;
+    animation: cinta 40s linear infinite;
+  }
+  .cinta-inversa {
+    animation-direction: reverse;
+  }
+  .carril:hover .cinta {
+    animation-play-state: paused;
+  }
+
+  /* ---------- Tienda: animaciones al hacer scroll (componente <Revelar>) ---------- */
+  .revelar {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition:
+      opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--retraso, 0ms);
+  }
+  .revelar.es-visible {
+    opacity: 1;
+    transform: none;
+  }
+  /* Imagen que entra con zoom cuando su bloque aparece */
+  .zoom-entrada {
+    opacity: 0;
+    transform: scale(1.14);
+    transition:
+      opacity 1.1s ease,
+      transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: calc(var(--retraso, 0ms) + 120ms);
+  }
+  .es-visible .zoom-entrada,
+  .es-visible.zoom-entrada {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Pedestal con anillo de neón bajo los productos del hero */
+  .pedestal {
+    position: absolute;
+    left: 50%;
+    width: 120%;
+    aspect-ratio: 4 / 1;
+    translate: -50% 0;
+    border-radius: 50%;
+    border: 2px solid hsl(var(--primary) / 0.55);
+    background: radial-gradient(closest-side, hsl(var(--primary) / 0.25), transparent);
+    box-shadow:
+      0 0 24px hsl(var(--primary) / 0.45),
+      inset 0 0 18px hsl(var(--primary) / 0.35);
+  }
+
+  /* Rejilla de puntos de fondo (mega menú, ventanas) */
+  .puntos {
+    background-image: radial-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  /* Barra de desplazamiento oculta (carruseles con scroll horizontal) */
+  .sin-barra {
+    scrollbar-width: none;
+  }
+  .sin-barra::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes flotar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes linea-viaje {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+.flotar {
+  animation: flotar 6s ease-in-out infinite;
+}
+.girar-lento {
+  animation: girar 60s linear infinite;
+}
+/* Línea con un brillo que la recorre (cadena de pasos, barra superior) */
+.linea-viaje {
+  background-image: linear-gradient(90deg, transparent 0%, hsl(var(--primary)) 50%, transparent 100%);
+  background-size: 50% 100%;
+  background-repeat: no-repeat;
+  animation: linea-viaje 2.8s linear infinite;
+}
+
+@keyframes guiones {
+  to {
+    background-position: 28px 0;
+  }
+}
+
+@keyframes cinta {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .linea-guiones,
+  .cinta,
+  .animate-aparecer,
+  .animate-respirar,
+  .flotar,
+  .girar-lento,
+  .linea-viaje {
+    animation: none !important;
+  }
+  .revelar,
+  .zoom-entrada {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }

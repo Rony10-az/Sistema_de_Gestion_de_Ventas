@@ -25,10 +25,12 @@ export function TablaCargando({ filas = 5, columnas = 4 }) {
 
 export function EstadoVacio({ titulo = 'No hay registros', descripcion, accion }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed px-6 py-12 text-center">
-      <Inbox className="size-10 text-muted-foreground" aria-hidden="true" />
+    <div className="flex animate-aparecer flex-col items-center gap-4 rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-6 py-14 text-center">
+      <span className="grid size-14 place-items-center rounded-2xl border border-primary/30 bg-primary/10">
+        <Inbox className="size-6 text-accent-foreground" aria-hidden="true" />
+      </span>
       <div>
-        <p className="font-medium">{titulo}</p>
+        <p className="font-display text-lg font-semibold text-white">{titulo}</p>
         {descripcion && <p className="mt-1 text-sm text-muted-foreground">{descripcion}</p>}
       </div>
       {accion}
@@ -38,7 +40,7 @@ export function EstadoVacio({ titulo = 'No hay registros', descripcion, accion }
 
 export function EstadoError({ titulo = 'No se pudieron cargar los datos', mensaje, onReintentar }) {
   return (
-    <div role="alert" className="flex flex-col items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-6 py-12 text-center">
+    <div role="alert" className="flex animate-aparecer flex-col items-center gap-3 rounded-2xl border border-destructive/30 bg-destructive/5 px-6 py-12 text-center">
       <TriangleAlert className="size-10 text-destructive" aria-hidden="true" />
       <div>
         <p className="font-medium">{titulo}</p>

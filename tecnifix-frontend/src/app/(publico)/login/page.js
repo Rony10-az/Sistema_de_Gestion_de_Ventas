@@ -5,8 +5,9 @@
 // Con datos de prueba activos muestra los usuarios de prueba de cada rol.
 
 import { Suspense, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Eye, EyeOff, LoaderCircle, Wrench } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, LoaderCircle, Wrench } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../../../hooks/useAuth';
 import { Button } from '../../../components/ui/button';
@@ -75,9 +76,10 @@ function FormularioLogin() {
   }
 
   return (
-    <Card className="w-full max-w-sm">
+    <Card className="relative w-full max-w-md overflow-hidden">
+      <span className="degradado-marca absolute inset-x-0 top-0 h-px opacity-80" aria-hidden="true" />
       <CardHeader>
-        <CardTitle className="text-xl">Iniciar sesión</CardTitle>
+        <CardTitle className="text-2xl text-white">Iniciar sesión</CardTitle>
         <CardDescription>Ingresa con tu cuenta de la tienda.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -120,15 +122,15 @@ function FormularioLogin() {
               </button>
             </div>
           </CampoFormulario>
-          <Button type="submit" disabled={enviando} className="mt-2">
+          <Button type="submit" size="lg" disabled={enviando} className="mt-2 w-full">
             {enviando && <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />}
             {enviando ? 'Ingresando…' : 'Ingresar'}
           </Button>
         </form>
 
         {USAR_MOCKS && (
-          <div className="mt-6 rounded-md border border-dashed p-3">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Usuarios de prueba</p>
+          <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-4">
+            <p className="etiqueta text-[0.65rem]">Usuarios de prueba</p>
             <p className="mt-1 text-xs text-muted-foreground">
               Solo en modo de datos de prueba. Contraseña: <code className="font-mono">{CLAVE_DE_PRUEBA}</code>
             </p>
@@ -156,31 +158,113 @@ function FormularioLogin() {
   );
 }
 
-export default function LoginPage() {
+// Frases de la cinta superior (se duplican para que el desplazamiento sea continuo).
+const CINTA = [
+  'Stock al día en cada venta',
+  'Boleta y factura con IGV 18 %',
+  'Kardex de cada producto',
+  'Alertas de stock mínimo',
+  'Reportes de ventas por día y por mes',
+];
+
+const VENTAJAS = [
+  'Cada venta descuenta el stock sola',
+  'Compras a proveedores que suben el stock',
+  'Un menú distinto para cada rol',
+];
+
+function Cinta() {
+  const fila = (oculta) => (
+    <ul className="flex shrink-0 items-center" aria-hidden={oculta || undefined}>
+      {CINTA.map((texto) => (
+        <li key={texto} className="flex items-center gap-6 pr-6 font-mono text-[0.72rem] uppercase tracking-[0.16em] text-muted-foreground">
+          <span className="size-1.5 rotate-45 bg-primary" aria-hidden="true" />
+          {texto}
+        </li>
+      ))}
+    </ul>
+  );
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      <section className="hidden flex-col justify-between bg-sidebar p-10 text-sidebar-foreground lg:flex">
-        <div className="flex items-center gap-2">
-          <span className="grid size-9 place-items-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-            <Wrench className="size-5" aria-hidden="true" />
-          </span>
-          <span className="text-xl font-semibold tracking-tight">TecniFix</span>
-        </div>
-        <div className="max-w-md">
-          <h1 className="text-3xl font-semibold leading-tight tracking-tight">
-            Ventas e inventario de tu tienda de repuestos, en un solo lugar.
-          </h1>
-          <p className="mt-4 text-sidebar-foreground/70">
-            Controla el stock de cada producto, registra las ventas con su boleta y revisa cuánto vendiste en el mes.
+    <div className="overflow-hidden border-b border-white/[0.06] bg-black/40 py-2.5 [mask-image:linear-gradient(90deg,transparent,#000_10%,#000_90%,transparent)]">
+      <div className="cinta">
+        {fila(false)}
+        {fila(true)}
+      </div>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  const retraso = (n) => ({ animationDelay: `${n * 90}ms` });
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Cinta />
+
+      <div className="mx-auto grid w-full max-w-6xl flex-1 items-center gap-12 px-5 py-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16 lg:px-8">
+        <section className="flex flex-col gap-7">
+          <div className="flex animate-aparecer flex-wrap items-center justify-between gap-4" style={retraso(0)}>
+            <Link href="/" className="flex items-center gap-2.5" aria-label="TecniFix, ir a la tienda">
+              <span className="degradado-marca grid size-10 place-items-center rounded-xl shadow-brillo">
+                <Wrench className="size-5 text-white" aria-hidden="true" />
+              </span>
+              <span className="font-display text-2xl font-semibold tracking-tight text-white">
+                Tecni<span className="texto-marca">Fix</span>
+              </span>
+            </Link>
+            <Link href="/" className="etiqueta inline-flex items-center gap-2 text-[0.62rem] hover:text-white">
+              <ArrowLeft className="size-3.5" aria-hidden="true" /> Volver a la tienda
+            </Link>
+          </div>
+
+          <p
+            className="etiqueta inline-flex w-fit animate-aparecer items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1.5"
+            style={retraso(1)}
+          >
+            <span className="size-1.5 animate-respirar rounded-full bg-primary" aria-hidden="true" />
+            Ventas e inventario · Repuestos y accesorios
           </p>
-        </div>
-        <p className="text-sm text-sidebar-foreground/50">Desarrollo de Aplicaciones Web Avanzado · Tecsup</p>
-      </section>
-      <section className="flex items-center justify-center p-6">
-        <Suspense fallback={null}>
-          <FormularioLogin />
-        </Suspense>
-      </section>
+
+          <div className="flex animate-aparecer flex-col gap-5" style={retraso(2)}>
+            <h1 className="font-display text-4xl font-bold uppercase leading-[1.02] tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Tu stock.
+              <br />
+              Tus ventas.
+              <br />
+              <span className="texto-marca">Bajo control.</span>
+            </h1>
+            <span className="linea-guiones" aria-hidden="true" />
+          </div>
+
+          <p className="max-w-[46ch] animate-aparecer text-base leading-relaxed text-muted-foreground" style={retraso(3)}>
+            Controla el stock de cada repuesto, registra las ventas con su boleta y revisa cuánto vendiste en el mes,
+            desde un solo lugar.
+          </p>
+
+          <ul className="flex animate-aparecer flex-col gap-3" style={retraso(4)}>
+            {VENTAJAS.map((texto) => (
+              <li key={texto} className="flex items-center gap-3 text-sm text-foreground/90">
+                <span className="grid size-6 place-items-center rounded-full border border-primary/40 bg-primary/10 text-accent-foreground">
+                  <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true">
+                    <path d="m5 12.5 4.5 4.5L19 7.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                {texto}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="flex animate-aparecer justify-center lg:justify-end" style={retraso(3)}>
+          <Suspense fallback={null}>
+            <FormularioLogin />
+          </Suspense>
+        </section>
+      </div>
+
+      <p className="etiqueta px-5 pb-6 text-center text-[0.62rem] text-muted-foreground/60">
+        Desarrollo de Aplicaciones Web Avanzado · Tecsup · 2026
+      </p>
     </div>
   );
 }

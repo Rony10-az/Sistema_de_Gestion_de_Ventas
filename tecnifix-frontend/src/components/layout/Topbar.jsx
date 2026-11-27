@@ -32,7 +32,7 @@ export default function Topbar() {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-8">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-white/[0.06] bg-background/60 px-4 backdrop-blur-xl md:px-8">
       <Sheet open={menuAbierto} onOpenChange={setMenuAbierto}>
         <SheetTrigger asChild>
           <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Abrir menú">
@@ -50,7 +50,8 @@ export default function Topbar() {
       </Sheet>
 
       {USAR_MOCKS && (
-        <Badge variant="outline" className="gap-1 border-warning/40 text-warning">
+        <Badge variant="outline" className="gap-1.5 border-white/10 bg-white/[0.03] font-mono text-[0.65rem] uppercase tracking-[0.14em] text-muted-foreground">
+          <span className="size-1.5 animate-respirar rounded-full bg-primary" aria-hidden="true" />
           <FlaskConical className="size-3" aria-hidden="true" />
           Datos de prueba
         </Badge>
@@ -60,7 +61,7 @@ export default function Topbar() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-auto gap-3 px-2 py-1.5">
-              <span className="grid size-8 place-items-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+              <span className="degradado-marca grid size-8 place-items-center rounded-full font-display text-xs font-semibold text-white shadow-brillo">
                 {iniciales(usuario.nombre)}
               </span>
               <span className="hidden text-left leading-tight sm:block">
