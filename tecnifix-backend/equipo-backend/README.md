@@ -5,8 +5,9 @@ tokens ni datos personales: todo el que tenga acceso al repositorio puede leerlo
 
 ## Inventario: últimos cambios
 
-Cada integrante de backend trabaja con su base en su entorno local: no se comparten
-migraciones. Para usar los módulos de inventario, tu base necesita estas tablas.
+Cada integrante de backend trabaja con su base en su entorno local, y todos la crean
+con las mismas migraciones: `npm run db:setup` aplica `002_modelo_tecnifix.sql`.
+Estas son las tablas que usan los módulos de inventario.
 
 | Módulo | Rutas | Estado |
 |---|---|---|
@@ -31,7 +32,7 @@ migraciones. Para usar los módulos de inventario, tu base necesita estas tablas
 
 Qué cambia para el resto:
 - En `productos`, `precio` pasa a `precio_venta` y desaparece `descripcion`. Con las
-  tablas de `001_init.sql`, `/productos` falla.
+  tablas de `001_init.sql`, `/productos` falla: aplica la `002`.
 - Productos exige sesión y los listados devuelven `{ data, total, pagina, limite }`.
 - `DELETE /productos/:id` desactiva el producto, no lo borra.
 - Las pruebas de integración de productos y compras necesitan esas tablas.
@@ -125,7 +126,7 @@ Nombres: `modulo.capa.js` (ej. `ventas.service.js`).
 Está terminada cuando valida los datos, comprueba el rol, responde con el formato
 acordado, tiene pruebas y está documentada.
 
-Un cambio en la base es una migración nueva (`002_...sql`); no se edita una ya subida.
+Un cambio en la base es una migración nueva (`003_...sql` en adelante); no se edita una ya subida.
 Los commits siguen la forma `tipo(backend): resumen`, con viñetas que expliquen los cambios.
 
 ## 4. Formato de respuestas
@@ -151,7 +152,10 @@ comprueba roles.
 login básico y CRUD de productos y clientes.
 
 **Incompleto:** crear una venta guarda total 0, sin detalle ni descuento de stock. La base
-tiene 5 de las 11 tablas del modelo.
+tiene las 11 tablas del modelo (`002_modelo_tecnifix.sql`).
+
+Usuarios de prueba (contraseña `tecnifix123`): `admin@tecnifix.pe`,
+`vendedor@tecnifix.pe` y `almacen@tecnifix.pe`.
 
 ## 6. Pasos a seguir
 
@@ -160,7 +164,7 @@ En este orden, porque cada uno se apoya en el anterior:
 | Paso | Qué hacer | Listo cuando |
 |---|---|---|
 | 1 | Escribir el contrato en `docs/API.md` | Backend y frontend lo aprueban |
-| 2 | Migración `002` según `docs/modelo-er.png`, con restricciones para stock y precios | `npm run db:setup` crea las 11 tablas |
+| 2 | ~~Migración `002` según `docs/modelo-er.png`~~ (hecha) | `npm run db:setup` crea las 11 tablas |
 | 3 | Un usuario de prueba por rol y adaptar productos (`precio` → `precio_venta`) | Pruebas y Bruno en verde |
 | 4 | `verificarRol`, usuarios solo para admin y quitar `/auth/register` | Sin permiso responde 403 |
 | 5 | Errores 404/409, validación con `zod` y paginación | Todas las rutas usan el formato |
