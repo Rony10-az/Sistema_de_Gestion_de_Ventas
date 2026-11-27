@@ -81,4 +81,23 @@ async function desactivar(id) {
   await pool.query('UPDATE productos SET activo = FALSE WHERE id = $1', [id]);
 }
 
-module.exports = { listar, obtenerPorId, obtenerPorSku, crear, actualizar, desactivar };
+// Suma stock dentro de la transacción de quien llama (client). El UPDATE bloquea
+// la fila hasta el COMMIT. Devuelve undefined si el producto no existe o está
+// desactivado.
+async function sumarStock(client, id, cantidad) {
+  const { rows } = await client.query(
+    'UPDATE productos SET stock = stock + $2 WHERE id = $1 AND activo RETURNING stock',
+    [id, cantidad]
+  );
+  return rows[0]?.stock;
+}
+
+module.exports = {
+  listar,
+  obtenerPorId,
+  obtenerPorSku,
+  crear,
+  actualizar,
+  desactivar,
+  sumarStock,
+};
