@@ -83,7 +83,7 @@ docker compose up --build
 |---|---|---|
 | Frontend (Next.js) | `frontend` | http://localhost:3000 |
 | Backend (Express) | `backend` | http://localhost:4000 |
-| Base de datos (PostgreSQL 17) | `db` | `localhost:5433` |
+| Base de datos (PostgreSQL 17) | `db` | `localhost:5434` (cambiable con `POSTGRES_PORT`) |
 
 El backend aplica las migraciones y datos de prueba al arrancar. La base de Docker es
 distinta a la de tu PostgreSQL instalado y se conserva en el volumen `datos_db`.
@@ -93,7 +93,7 @@ distinta a la de tu PostgreSQL instalado y se conserva en el volumen `datos_db`.
 - Detener: `docker compose down`
 - Borrar también los datos: `docker compose down -v`
 - Solo la base (para correr el código con `npm run dev`): `docker compose up -d db`, y en
-  `tecnifix-backend/.env` usa `DB_PORT=5433` y la contraseña de `POSTGRES_PASSWORD`.
+  `tecnifix-backend/.env` usa `DB_PORT=5434` y la contraseña de `POSTGRES_PASSWORD`.
 
 ## Stack
 

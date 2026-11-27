@@ -11,8 +11,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
     ports:
-      # 5433 en tu PC para no chocar con un PostgreSQL ya instalado (5432).
-      - "127.0.0.1:5433:5432"
+      # 5434 en tu PC (POSTGRES_PORT) para no chocar con PostgreSQL instalados.
+      - "127.0.0.1:${POSTGRES_PORT:-5434}:5432"
     volumes:
       - datos_db:/var/lib/postgresql/data
     healthcheck:
