@@ -16,10 +16,12 @@ auth:bearer {
 
 body:json {
   {
-    "nombre": "Producto Bruno",
-    "descripcion": "Prueba",
-    "precio": 25.5,
-    "stock": 8
+    "sku": "{{productoSku}}",
+    "nombre": "Producto Bruno editado",
+    "categoria_id": 1,
+    "precio_compra": 18,
+    "precio_venta": 25.5,
+    "stock_minimo": 5
   }
 }
 

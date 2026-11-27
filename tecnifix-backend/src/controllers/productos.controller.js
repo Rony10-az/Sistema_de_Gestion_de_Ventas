@@ -1,12 +1,19 @@
 // Controlador de "productos": traduce HTTP <-> service.
-// Cada método delega toda la lógica de negocio a productos.service.js.
+// Los datos llegan ya validados en res.locals (ver productos.validator.js).
 
 const productosService = require('../services/productos.service');
 
+// El error central todavía no envía "campos", así que se responde aquí.
+function fallar(error, res, next) {
+  if (error.campos) {
+    return res.status(error.status).json({ error: error.message, campos: error.campos });
+  }
+  return next(error);
+}
+
 async function listar(req, res, next) {
   try {
-    const productos = await productosService.listar();
-    res.json(productos);
+    res.json(await productosService.listar(res.locals.query, req.usuario));
   } catch (error) {
     next(error);
   }
@@ -14,8 +21,7 @@ async function listar(req, res, next) {
 
 async function obtenerPorId(req, res, next) {
   try {
-    const producto = await productosService.obtenerPorId(req.params.id);
-    res.json(producto);
+    res.json(await productosService.obtenerPorId(res.locals.params.id, req.usuario));
   } catch (error) {
     next(error);
   }
@@ -23,29 +29,28 @@ async function obtenerPorId(req, res, next) {
 
 async function crear(req, res, next) {
   try {
-    const producto = await productosService.crear(req.body);
-    res.status(201).json(producto);
+    res.status(201).json(await productosService.crear(res.locals.body, req.usuario));
   } catch (error) {
-    next(error);
+    fallar(error, res, next);
   }
 }
 
 async function actualizar(req, res, next) {
   try {
-    const producto = await productosService.actualizar(req.params.id, req.body);
-    res.json(producto);
+    const { id } = res.locals.params;
+    res.json(await productosService.actualizar(id, res.locals.body, req.usuario));
   } catch (error) {
-    next(error);
+    fallar(error, res, next);
   }
 }
 
-async function eliminar(req, res, next) {
+async function desactivar(req, res, next) {
   try {
-    await productosService.eliminar(req.params.id);
+    await productosService.desactivar(res.locals.params.id);
     res.status(204).send();
   } catch (error) {
     next(error);
   }
 }
 
-module.exports = { listar, obtenerPorId, crear, actualizar, eliminar };
+module.exports = { listar, obtenerPorId, crear, actualizar, desactivar };

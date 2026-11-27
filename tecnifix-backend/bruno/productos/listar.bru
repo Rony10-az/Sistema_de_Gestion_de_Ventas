@@ -5,9 +5,13 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/productos
+  url: {{baseUrl}}/productos?pagina=1&limite=10
   body: none
-  auth: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
 }
 
 tests {

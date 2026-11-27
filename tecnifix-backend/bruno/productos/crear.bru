@@ -16,11 +16,17 @@ auth:bearer {
 
 body:json {
   {
+    "sku": "{{productoSku}}",
     "nombre": "Producto Bruno",
-    "descripcion": "Prueba",
-    "precio": 25.5,
-    "stock": 5
+    "categoria_id": 1,
+    "precio_compra": 18,
+    "precio_venta": 25.5,
+    "stock_minimo": 5
   }
+}
+
+script:pre-request {
+  bru.setVar("productoSku", "BRU-" + Date.now());
 }
 
 script:post-response {
