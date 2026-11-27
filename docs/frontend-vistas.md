@@ -157,6 +157,8 @@ Mocks: `clientes.mock.js`, `ventas.mock.js`, `reportes.mock.js`. Services: `clie
 
 ## 5. Pendientes para coordinar con el backend de Rony
 
+El seguimiento detallado de estos pedidos está en `docs/pendientes-backend.md`.
+
 | Tema | Qué espera el frontend |
 |---|---|
 | Login con clave incorrecta | Responder **401** (hoy responde 400; el frontend acepta los dos) |
