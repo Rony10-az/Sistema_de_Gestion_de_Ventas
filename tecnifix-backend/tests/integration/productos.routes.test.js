@@ -4,6 +4,10 @@
 
 const request = require('supertest');
 const app = require('../../src/app');
+const pool = require('../../src/config/database');
+
+// Cierra las conexiones para que Jest pueda terminar.
+afterAll(() => pool.end());
 
 describe('GET /productos', () => {
   test('responde 200 con un arreglo', async () => {

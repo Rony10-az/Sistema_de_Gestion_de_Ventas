@@ -70,13 +70,32 @@ POST   /ventas
 ## Cómo correr
 
 ```bash
-cp .env.example .env     # completar credenciales de PostgreSQL y JWT_SECRET
 npm install
+npm run env:init          # crea .env; luego escribe tu DB_PASSWORD
+npm run db:setup          # crea la base, migra y carga datos de prueba
 npm run dev               # nodemon, recarga automática
-npm test                  # pruebas con Jest + Supertest
 ```
 
 ## Base de datos
 
-Ejecutar `src/database/migrations/001_init.sql` sobre la base `sistema_ventas` para
-crear las tablas. Opcionalmente `src/database/seeds/seed.sql` para datos de prueba.
+| Script | Qué hace |
+|---|---|
+| `npm run db:check` | Prueba la conexión. |
+| `npm run db:create` | Crea la base local (`DB_NAME`) si no existe. |
+| `npm run db:migrate` | Aplica las migraciones pendientes de `src/database/migrations`. |
+| `npm run db:seed` | Carga los datos pendientes de `src/database/seeds`. |
+| `npm run db:setup` | `create` + `migrate` + `seed`. |
+
+Lo aplicado se anota en la tabla `schema_migrations`, así que se pueden repetir sin
+duplicar. Un cambio en la base es un archivo nuevo numerado (`002_...sql`). Si ya
+habías cargado `seed.sql` a mano, `db:seed` fallará por registros repetidos.
+
+Se usa PostgreSQL instalado en cada computadora; cada integrante tiene su propia base.
+
+## Pruebas
+
+```bash
+npm run test:unit          # no necesita base de datos
+npm run test:integration   # necesita la base migrada
+npm test                   # todas
+```

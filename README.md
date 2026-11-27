@@ -58,8 +58,9 @@ El frontend consume esas mismas rutas vía `NEXT_PUBLIC_API_URL` (ver `tecnifix-
 ```bash
 # Backend
 cd Sistema_de_Gestion_de_Ventas/tecnifix-backend
-cp .env.example .env
 npm install
+npm run env:init     # luego escribe tu DB_PASSWORD en .env
+npm run db:setup
 npm run dev
 
 # Frontend (en otra terminal)
