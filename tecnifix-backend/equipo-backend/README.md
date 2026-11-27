@@ -16,7 +16,9 @@ migraciones. Para usar los módulos de inventario, tu base necesita estas tablas
 | Compras | `GET` `POST /compras` · `GET /compras/:id` | Listo |
 | Ajustes y kardex | `POST /inventario/ajustes` · `GET /productos/:id/movimientos` | Listo |
 | Descuento y devolución de stock para ventas | Funciones en `inventario.service.js` | Listo |
-| Alerta de stock mínimo por correo | `correo.service.js` | Código listo, falta instalar `nodemailer` |
+| Alerta de stock mínimo por correo | `correo.service.js` | Listo (correo opcional) |
+
+**Dependencia nueva: `nodemailer`.** Después del `git pull`, ejecuta `npm install`.
 
 | Tabla | Columnas |
 |---|---|
