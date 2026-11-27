@@ -17,11 +17,19 @@ response ← controller ← ← ← ← ← ← ┘
 | `controllers/` | Lee `req` (body, params, query), llama al service correspondiente y arma la respuesta HTTP (status + JSON). | No contiene SQL ni reglas de negocio. |
 | `services/` | Reglas de negocio: validaciones, cálculos, orquestar varias repositorios, hashear contraseñas, firmar JWT. | No conoce `req`/`res` de Express, no escribe SQL directo. |
 | `repositories/` | Única capa que sabe que la base de datos es PostgreSQL. Arma y ejecuta queries SQL con `pg`. | No valida reglas de negocio. |
-| `models/` | Forma/estructura de cada entidad (los campos de la tabla) y su documentación. | No ejecuta queries. |
+| `validators/` | Reglas de validación de los datos de cada módulo (`modulo.validator.js`). | No consulta la base de datos. |
 | `middlewares/` | Funciones que se ejecutan antes del controlador: verificar JWT, manejar errores, validar body. | — |
 | `utils/` | Helpers reutilizables sin estado (firmar/verificar JWT, formatear respuestas). | — |
 | `database/migrations` | Scripts SQL que crean/alteran tablas. | — |
 | `database/seeds` | Scripts SQL con datos de prueba. | — |
+
+## Nombres de archivos
+
+Las carpetas de capas van en inglés, los módulos en español y los archivos siguen la
+forma `modulo.capa.js` (ej. `productos.service.js`). Módulos previstos: `auth`,
+`usuarios`, `productos`, `categorias`, `proveedores`, `compras`, `inventario`,
+`clientes`, `ventas`, `pagos` y `reportes`. Hoy existen `auth`, `productos`, `clientes`
+y `ventas`.
 
 ## Dominios (módulos del negocio)
 

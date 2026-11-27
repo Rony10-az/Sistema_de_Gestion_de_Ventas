@@ -14,7 +14,7 @@ El diagrama de arquitectura del curso plantea un sistema final en **microservici
 de datos, detrás de un API Gateway, con CI/CD a Vercel/Render). Esa es la meta de escalado.
 
 **Esta primera estructura es un monolito modular**: un solo backend Express con capas
-`routes/controllers/services/repositories/models`, organizado **por dominio** (auth,
+`routes/controllers/services/repositories`, organizado **por dominio** (auth,
 productos, clientes, ventas). Se eligió así porque:
 
 - Es la base que pide la tarea ahora mismo (MVC + repositorios + servicios).
