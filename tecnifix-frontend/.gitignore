@@ -1,4 +1,12 @@
 node_modules/
 .next/
+out/
+
+# Variables de entorno: solo se sube .env.example
 .env
+.env.*
+!.env.example
+
 *.log
+.DS_Store
+Thumbs.db

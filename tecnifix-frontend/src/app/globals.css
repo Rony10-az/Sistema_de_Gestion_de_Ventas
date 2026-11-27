@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Colores de TecniFix (formato HSL que espera tailwind.config.js).
+  Base gris azulada, acento naranja de herramienta y menú lateral oscuro.
+  Para cambiar un color de toda la app se cambia aquí, no en los componentes.
+*/
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 215 28% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 28% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 12%;
+    --primary: 20 80% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 16% 93%;
+    --secondary-foreground: 215 28% 17%;
+    --muted: 210 16% 94%;
+    --muted-foreground: 215 14% 38%;
+    --accent: 24 90% 95%;
+    --accent-foreground: 20 80% 30%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 60% 32%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 42%;
+    --warning-foreground: 0 0% 100%;
+    --border: 214 20% 88%;
+    --input: 214 20% 84%;
+    --ring: 20 80% 40%;
+    --chart-1: 20 80% 45%;
+    --chart-2: 173 58% 33%;
+    --chart-3: 221 60% 45%;
+    --chart-4: 43 90% 50%;
+    --chart-5: 280 40% 50%;
+    --radius: 0.5rem;
+    --sidebar: 215 30% 14%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 22 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 25% 21%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 215 22% 22%;
+    --sidebar-ring: 22 85% 55%;
+  }
+
+  .dark {
+    --background: 215 30% 9%;
+    --foreground: 210 20% 92%;
+    --card: 215 28% 12%;
+    --card-foreground: 210 20% 92%;
+    --popover: 215 28% 12%;
+    --popover-foreground: 210 20% 92%;
+    --primary: 22 85% 55%;
+    --primary-foreground: 215 30% 9%;
+    --secondary: 215 22% 18%;
+    --secondary-foreground: 210 20% 92%;
+    --muted: 215 22% 18%;
+    --muted-foreground: 215 14% 65%;
+    --accent: 20 40% 18%;
+    --accent-foreground: 24 90% 80%;
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 50% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 215 30% 9%;
+    --border: 215 20% 22%;
+    --input: 215 20% 25%;
+    --ring: 22 85% 55%;
+    --sidebar: 215 32% 7%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 22 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 25% 16%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 215 22% 16%;
+    --sidebar-ring: 22 85% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}

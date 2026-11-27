@@ -1,11 +1,22 @@
-// Página raíz "/". Punto de entrada de la app: si hay sesión redirige
-// a /dashboard, si no a /login. Por ahora solo un placeholder.
+'use client';
+
+// Página raíz "/": si hay sesión manda al dashboard; si no, al login.
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../hooks/useAuth';
 
 export default function HomePage() {
+  const { usuario, cargando } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!cargando) router.replace(usuario ? '/dashboard' : '/login');
+  }, [usuario, cargando, router]);
+
   return (
-    <main>
-      <h1>TecniFix</h1>
-      {/* TODO: redirigir según useAuth().usuario a /dashboard o /login */}
-    </main>
+    <div className="grid min-h-screen place-items-center text-sm text-muted-foreground" role="status">
+      Cargando TecniFix…
+    </div>
   );
 }
