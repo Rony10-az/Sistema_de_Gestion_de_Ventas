@@ -13,8 +13,10 @@
     "db:seed": "node src/database/cli.js seed",
     "db:setup": "npm run db:create && npm run db:migrate && npm run db:seed",
     "test": "jest --runInBand",
-    "test:unit": "jest tests/unit",
-    "test:integration": "jest tests/integration --runInBand"
+    "test:unit": "jest --selectProjects unit",
+    "test:integration": "jest --selectProjects integration --runInBand",
+    "test:coverage": "jest --coverage --runInBand",
+    "test:watch": "jest --selectProjects unit --watch"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
