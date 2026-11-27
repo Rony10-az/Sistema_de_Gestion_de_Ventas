@@ -1,1 +1,41 @@
+# Dependencias y compilados
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+
+# Variables de entorno: solo se sube .env.example
 .env
+.env.*
+!.env.example
+
+# Despliegue (vercel link crea aquí un token)
+.vercel/
+
+# Ajustes personales del editor y notas
+.obsidian/
+.vscode/settings.json
+# Los archivos propios de cada asistente de IA NO van aquí:
+# cada uno los agrega en .git/info/exclude (exclusiones locales que no se suben).
+
+# Documentos de entrega y archivos personales
+*.docx
+*.pdf
+*.pptx
+*.xlsx
+
+# Copias de la base de datos
+*.dump
+*.backup
+
+# Registros y archivos del sistema
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Notas de trabajo de cada integrante: borradores, pruebas, capturas.
+# Se comparten por Discord; lo que el otro equipo necesita va en docs/pendientes-backend.md
+notas/
