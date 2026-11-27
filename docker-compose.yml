@@ -1,0 +1,53 @@
+# Las tres partes de TecniFix: base de datos, backend y frontend.
+# Uso:  copiar .env.example como .env y ejecutar  docker compose up --build
+
+name: tecnifix
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: sistema_ventas
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
+    ports:
+      # 5433 en tu PC para no chocar con un PostgreSQL ya instalado (5432).
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - datos_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sistema_ventas"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./tecnifix-backend
+    environment:
+      PORT: 4000
+      CORS_ORIGIN: http://localhost:3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: sistema_ventas
+      DB_USER: postgres
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?Falta JWT_SECRET en .env}
+    ports:
+      - "127.0.0.1:4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./tecnifix-frontend
+      args:
+        # La usa el navegador, por eso es localhost y no "backend".
+        NEXT_PUBLIC_API_URL: http://localhost:4000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  datos_db:
