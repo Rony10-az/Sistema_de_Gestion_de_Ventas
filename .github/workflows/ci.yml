@@ -1,0 +1,71 @@
+# Comprueba cada push a main (y cada Pull Request): pruebas del backend y
+# compilación del frontend. No despliega nada.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend (pruebas)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          # Base desechable que solo existe mientras corre este trabajo.
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: sistema_ventas
+    defaults:
+      run:
+        working-directory: tecnifix-backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tecnifix-backend/package-lock.json
+      - run: npm ci
+      # Las pruebas crean, migran y cargan la base tecnifix_test.
+      - run: npm test
+
+  frontend:
+    name: Frontend (lint y build)
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      NEXT_PUBLIC_USE_MOCKS: 'false'
+      NEXT_TELEMETRY_DISABLED: 1
+    defaults:
+      run:
+        working-directory: tecnifix-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tecnifix-frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
