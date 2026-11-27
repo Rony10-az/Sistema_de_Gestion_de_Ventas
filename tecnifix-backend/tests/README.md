@@ -1,11 +1,16 @@
 # Tests del backend
 
-- `unit/` — pruebas unitarias de services (lógica de negocio), mockeando los
-  repositorios para no tocar la base de datos real.
-- `integration/` — pruebas de integración con Supertest sobre `src/app.js`,
-  levantan peticiones HTTP reales contra las rutas (ideal con una base de
-  datos de pruebas aparte).
+| Comando | Qué ejecuta | ¿Necesita base de datos? |
+|---|---|---|
+| `npm run test:unit` | Services y middlewares, con repositorios simulados | No |
+| `npm run test:integration` | Rutas HTTP con Supertest | Sí |
+| `npm test` | Todo | Sí |
+| `npm run test:coverage` | Todo, con reporte de cobertura | Sí |
+| `npm run test:watch` | Unitarias, repitiéndose al guardar | No |
 
-```bash
-npm test
-```
+Las de integración usan la base `tecnifix_test` (o `DB_NAME_TEST`), que se crea, migra
+y carga sola. La conexión sale de tu `.env`, así que tu base de desarrollo no se toca.
+
+Los `test.todo` son comportamientos del plan que aún no están programados.
+
+Para probar a mano la API, ver la colección de Bruno en `../bruno/`.
