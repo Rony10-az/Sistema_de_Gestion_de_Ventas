@@ -38,6 +38,17 @@ y quién la hace. Por ahora importa que **las vistas funcionen**; el diseño fin
 | Reportes | `/reportes` | ✓ | — | — | Pareja de ventas |
 | Usuarios | `/usuarios` | ✓ | — | — | Oscar |
 
+**Tienda pública** (sin sesión, la ve cualquier cliente) · Oscar · **lista con datos de prueba**:
+
+| Vista | Ruta | Qué tiene |
+|---|---|---|
+| Portada | `/` | Bóveda animada que se abre, cintas de marcas, asistente de compra (3 preguntas), carrusel, marca propia, compromisos, opiniones, preguntas frecuentes |
+| Catálogo | `/catalogo?categoria=&q=` | Filtros por categoría, búsqueda, "solo con stock" y orden |
+| Ficha de producto | `/catalogo/[slug]` | Galería con zoom, stock real, cantidad, ficha técnica, relacionados y barra fija de compra |
+| En todas | — | Mega menú, buscador, carrito lateral con IGV, chat de ayuda y sello "Compra con respaldo" |
+
+Falta: formulario de reserva (nombre, DNI, teléfono) y conectarla a la API pública (`docs/pendientes-backend.md`, puntos 5 y 6).
+
 "Pareja de ventas" = Jacqueline y Chinchaiguara, por turnos (la que esté en frontend ese día).
 El menú y el bloqueo por rol ya están en `src/lib/roles.js`: si una ruta nueva necesita otro permiso, se le pide a Oscar.
 
@@ -147,7 +158,7 @@ Mocks: `clientes.mock.js`, `ventas.mock.js`, `reportes.mock.js`. Services: `clie
 
 | Persona | Crea o modifica solo esto en `tecnifix-frontend/src/` |
 |---|---|
-| Oscar | `app/layout.js`, `app/page.js`, `app/robots.js`, `app/not-found.js`, `app/(publico)/`, `app/(panel)/layout.js`, `app/(panel)/usuarios/`, `components/ui/`, `components/layout/`, `context/`, `hooks/`, `lib/`, `mocks/auth.mock.js`, `mocks/usuarios.mock.js`, services `auth` y `usuarios`, `package.json` |
+| Oscar | `app/layout.js`, `app/robots.js`, `app/not-found.js`, `app/(publico)/`, `app/(tienda)/`, `app/(panel)/layout.js`, `app/(panel)/usuarios/`, `components/ui/`, `components/layout/`, `components/tienda/`, `context/`, `hooks/`, `lib/`, `mocks/auth.mock.js`, `mocks/usuarios.mock.js`, `mocks/tienda.mock.js`, services `auth` y `usuarios`, `package.json`, `next.config.js` |
 | Gabriel | `app/(panel)/productos/`, `categorias/`, `proveedores/`, `compras/`, `components/inventario/`, mocks y services de `productos`, `categorias`, `proveedores`, `compras`, `inventario` |
 | Pareja de ventas | `app/(panel)/clientes/`, `ventas/`, `dashboard/`, `reportes/`, `components/clientes/`, `ventas/`, `dashboard/`, mocks y services de `clientes`, `ventas`, `pagos`, `reportes` |
 
@@ -159,11 +170,11 @@ Mocks: `clientes.mock.js`, `ventas.mock.js`, `reportes.mock.js`. Services: `clie
 
 El seguimiento detallado de estos pedidos está en `docs/pendientes-backend.md`.
 
-| Tema | Qué espera el frontend |
+| Tema | Estado |
 |---|---|
-| Login con clave incorrecta | Responder **401** (hoy responde 400; el frontend acepta los dos) |
-| Listados | Responder `{ data, total, pagina, limite }` (hoy `GET /productos` devuelve una lista simple) |
-| Tablas nuevas | Categorías, proveedores, compras, movimientos y pagos (hoy la base tiene 5 de las 11 tablas) |
-| Ajustes de stock | Dónde se guarda el motivo del ajuste |
-| Caja | Orden de las llamadas: `/pagos/simular` y luego `/ventas` |
-| Contrato | Publicar `docs/API.md` con el cuerpo y la respuesta de cada ruta |
+| 11 tablas, motivo del ajuste, contrato y paginación de inventario | **Hecho** (migración 002 y `docs/API.md`) |
+| Login con clave incorrecta | Pendiente: responder **401** (hoy 400; el frontend acepta los dos) |
+| Contrato de auth, clientes, ventas y pagos | Pendiente en `docs/API.md` |
+| Usuarios, dashboard y reportes | Pendiente: rutas nuevas |
+| Tienda pública y reservas | Nuevo, por conversar |
+| CORS con la URL de Vercel | Pendiente |

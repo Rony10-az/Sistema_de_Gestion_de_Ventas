@@ -24,8 +24,13 @@ Cuando el backend esté corriendo, cambia a `NEXT_PUBLIC_USE_MOCKS=false` y ajus
 
 ## Estructura
 
+La guía para el equipo (estado, tareas de cada uno, qué falta diseñar y pendientes con backend) está en
+**`equipo-frontend/README.md`**.
+
 | Carpeta | Qué va aquí |
 |---|---|
+| `src/app/(tienda)/` | Tienda pública: portada (`/`), catálogo (`/catalogo`) y ficha de producto (`/catalogo/[slug]`). |
+| `src/components/tienda/` | Piezas de la tienda: cabecera con mega menú, carrito, tarjetas, bóveda animada, chat, sello y `Revelar` (aparece al hacer scroll). |
 | `src/app/(publico)/` | Páginas sin sesión (login). El paréntesis no aparece en la URL. |
 | `src/app/(panel)/` | Páginas internas. Su `layout.js` pone el menú por rol y manda al login si no hay sesión. |
 | `src/components/ui/` | Componentes genéricos (shadcn/ui y los comunes de TecniFix). Sin lógica de negocio. |
@@ -33,8 +38,8 @@ Cuando el backend esté corriendo, cambia a `NEXT_PUBLIC_USE_MOCKS=false` y ajus
 | `src/components/inventario/`, `clientes/`, `ventas/`, `dashboard/` | Componentes propios de cada módulo, en `PascalCase`. |
 | `src/services/` | Llamadas a la API, un archivo por dominio. Solo ellos usan `apiFetch`. |
 | `src/mocks/` | Datos de prueba de cada módulo (`modulo.mock.js`), con la forma del contrato. |
-| `src/lib/` | `fetcher.js`, `mock.js`, `formato.js`, `roles.js` y `utils.js`. |
-| `src/context/`, `src/hooks/` | Sesión del usuario (`AuthContext`, `useAuth`). |
+| `src/lib/` | `fetcher.js`, `mock.js`, `formato.js`, `roles.js`, `utils.js` y `cargador-imagenes.js` (fotos de Unsplash ya redimensionadas). |
+| `src/context/`, `src/hooks/` | Sesión del usuario (`AuthContext`, `useAuth`) y carrito de la tienda (`CarritoContext`). |
 
 ## Base común (úsenla, no la dupliquen)
 
