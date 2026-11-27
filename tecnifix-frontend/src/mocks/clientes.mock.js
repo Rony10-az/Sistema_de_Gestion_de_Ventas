@@ -17,21 +17,21 @@ export const clientesMock = [
 // Historial de ventas por id de cliente: { serie_numero, fecha, total, estado }.
 export const ventasClientesMock = {
   1: [
-    { serie_numero: 'B001-00000012', fecha: '2026-11-20T15:30:00Z', total: 119.0, estado: 'completada' },
-    { serie_numero: 'B001-00000007', fecha: '2026-11-05T10:12:00Z', total: 45.5, estado: 'completada' },
-    { serie_numero: 'B001-00000003', fecha: '2026-10-18T18:45:00Z', total: 230.9, estado: 'anulada' },
+    { serie_numero: 'B001-000012', fecha: '2026-11-20T15:30:00Z', total: 119.0, estado: 'pagada' },
+    { serie_numero: 'B001-000007', fecha: '2026-11-05T10:12:00Z', total: 45.5, estado: 'pagada' },
+    { serie_numero: 'B001-000003', fecha: '2026-10-18T18:45:00Z', total: 230.9, estado: 'anulada' },
   ],
-  2: [{ serie_numero: 'B001-00000010', fecha: '2026-11-18T12:00:00Z', total: 89.9, estado: 'completada' }],
+  2: [{ serie_numero: 'B001-000010', fecha: '2026-11-18T12:00:00Z', total: 89.9, estado: 'pagada' }],
   3: [
-    { serie_numero: 'F001-00000005', fecha: '2026-11-24T09:20:00Z', total: 1850.0, estado: 'completada' },
-    { serie_numero: 'F001-00000003', fecha: '2026-11-10T14:05:00Z', total: 2430.5, estado: 'completada' },
-    { serie_numero: 'F001-00000001', fecha: '2026-10-28T11:30:00Z', total: 760.0, estado: 'completada' },
+    { serie_numero: 'F001-000005', fecha: '2026-11-24T09:20:00Z', total: 1850.0, estado: 'pagada' },
+    { serie_numero: 'F001-000003', fecha: '2026-11-10T14:05:00Z', total: 2430.5, estado: 'pagada' },
+    { serie_numero: 'F001-000001', fecha: '2026-10-28T11:30:00Z', total: 760.0, estado: 'pagada' },
   ],
-  5: [{ serie_numero: 'F001-00000004', fecha: '2026-11-15T16:10:00Z', total: 980.0, estado: 'completada' }],
+  5: [{ serie_numero: 'F001-000004', fecha: '2026-11-15T16:10:00Z', total: 980.0, estado: 'pagada' }],
   6: [
-    { serie_numero: 'B001-00000014', fecha: '2026-11-25T17:00:00Z', total: 64.0, estado: 'completada' },
-    { serie_numero: 'B001-00000009', fecha: '2026-11-12T13:25:00Z', total: 150.0, estado: 'anulada' },
+    { serie_numero: 'B001-000014', fecha: '2026-11-25T17:00:00Z', total: 64.0, estado: 'pagada' },
+    { serie_numero: 'B001-000009', fecha: '2026-11-12T13:25:00Z', total: 150.0, estado: 'anulada' },
   ],
-  8: [{ serie_numero: 'F001-00000002', fecha: '2026-11-02T10:00:00Z', total: 5200.0, estado: 'completada' }],
-  10: [{ serie_numero: 'B001-00000013', fecha: '2026-11-22T19:15:00Z', total: 38.5, estado: 'completada' }],
+  8: [{ serie_numero: 'F001-000002', fecha: '2026-11-02T10:00:00Z', total: 5200.0, estado: 'pagada' }],
+  10: [{ serie_numero: 'B001-000013', fecha: '2026-11-22T19:15:00Z', total: 38.5, estado: 'pagada' }],
 };

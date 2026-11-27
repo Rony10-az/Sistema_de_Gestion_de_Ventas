@@ -167,7 +167,7 @@ export default function FichaClientePage() {
                   <TableCell className="text-right tabular-nums">{formatearSoles(v.total)}</TableCell>
                   <TableCell>
                     <Badge variant={v.estado === 'anulada' ? 'destructive' : 'secondary'}>
-                      {v.estado === 'anulada' ? 'Anulada' : 'Completada'}
+                      {v.estado === 'anulada' ? 'Anulada' : 'Pagada'}
                     </Badge>
                   </TableCell>
                 </TableRow>
