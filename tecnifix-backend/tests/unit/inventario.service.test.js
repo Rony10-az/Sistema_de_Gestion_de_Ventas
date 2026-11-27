@@ -1,5 +1,7 @@
 jest.mock('../../src/repositories/inventario.repository');
 jest.mock('../../src/repositories/productos.repository');
+jest.mock('../../src/services/correo.service');
+const correo = require('../../src/services/correo.service');
 const inventario = require('../../src/repositories/inventario.repository');
 const productos = require('../../src/repositories/productos.repository');
 const service = require('../../src/services/inventario.service');
@@ -88,5 +90,36 @@ describe('inventario.service', () => {
       client,
       expect.objectContaining({ tipo: 'entrada', cantidad: 2, stock_resultante: 9 })
     );
+  });
+
+  const bajo = { id: 3, nombre: 'Mica', activo: true, stock: 2, stock_minimo: 3 };
+
+  test('avisa cuando la salida hace llegar al stock mínimo', async () => {
+    productos.obtenerPorId.mockResolvedValue(bajo);
+
+    await service.avisarStockBajo([{ producto_id: 3, cantidad: 2 }]);
+
+    expect(correo.enviarAlertaStock).toHaveBeenCalledWith(bajo);
+  });
+
+  test.each([
+    ['ya estaba bajo', bajo, 1],
+    ['sigue sobre el mínimo', { ...bajo, stock: 9 }, 5],
+    ['está desactivado', { ...bajo, activo: false }, 2],
+  ])('no avisa si %s', async (_, producto, cantidad) => {
+    productos.obtenerPorId.mockResolvedValue(producto);
+
+    await service.avisarStockBajo([{ producto_id: 3, cantidad }]);
+
+    expect(correo.enviarAlertaStock).not.toHaveBeenCalled();
+  });
+
+  test('un fallo al revisar no se propaga', async () => {
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    productos.obtenerPorId.mockRejectedValue(new Error('sin base'));
+
+    await expect(
+      service.avisarStockBajo([{ producto_id: 3, cantidad: 2 }])
+    ).resolves.toBeUndefined();
   });
 });

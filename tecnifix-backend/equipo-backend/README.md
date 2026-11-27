@@ -16,7 +16,7 @@ migraciones. Para usar los módulos de inventario, tu base necesita estas tablas
 | Compras | `GET` `POST /compras` · `GET /compras/:id` | Listo |
 | Ajustes y kardex | `POST /inventario/ajustes` · `GET /productos/:id/movimientos` | Listo |
 | Descuento y devolución de stock para ventas | Funciones en `inventario.service.js` | Listo |
-| Alerta de stock mínimo por correo | — | Pendiente |
+| Alerta de stock mínimo por correo | `correo.service.js` | Código listo, falta instalar `nodemailer` |
 
 | Tabla | Columnas |
 |---|---|
@@ -56,6 +56,16 @@ await enTransaccion(async (client) => {
   }
 });
 ```
+
+Después de que la venta se guarde (fuera de la transacción), se pide la alerta de
+stock mínimo, sin `await`:
+
+```js
+inventarioService.avisarStockBajo(items); // [{ producto_id, cantidad }]
+```
+
+El correo se activa con `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` y
+`CORREO_ADMIN` en tu `.env` (ver `.env.example`). Sin ellos la API funciona igual.
 
 Al anular una venta se usa `registrarDevolucion`, con los mismos datos. En el kardex la
 cantidad lleva signo: positiva si el stock sube y negativa si baja.

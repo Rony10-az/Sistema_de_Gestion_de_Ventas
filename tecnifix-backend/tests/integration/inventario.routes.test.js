@@ -8,6 +8,10 @@ const productos = require('../../src/repositories/productos.repository');
 const { enTransaccion } = require('../../src/repositories/inventario.repository');
 const service = require('../../src/services/inventario.service');
 const { autorizacion } = require('../helpers/token');
+const env = require('../../src/config/env');
+
+// Las pruebas nunca envían correos, aunque el .env tenga SMTP configurado.
+env.correo.host = '';
 
 afterAll(() => pool.end());
 

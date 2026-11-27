@@ -3,6 +3,7 @@
 
 const inventarioRepository = require('../repositories/inventario.repository');
 const productosRepository = require('../repositories/productos.repository');
+const correoService = require('./correo.service');
 
 function errorHttp(status, mensaje) {
   const error = new Error(mensaje);
@@ -19,7 +20,7 @@ async function exigirProducto(id) {
 async function ajustar({ producto_id, cantidad, motivo }, usuario) {
   const producto = await exigirProducto(producto_id);
 
-  return inventarioRepository.enTransaccion(async (client) => {
+  const movimiento = await inventarioRepository.enTransaccion(async (client) => {
     const stock = await productosRepository.ajustarStock(client, producto_id, cantidad);
     if (stock === undefined) {
       throw errorHttp(409, `El stock de ${producto.nombre} no puede quedar en negativo`);
@@ -33,6 +34,28 @@ async function ajustar({ producto_id, cantidad, motivo }, usuario) {
       usuario_id: usuario.id,
     });
   });
+
+  // Sin await: la respuesta no espera al servidor de correo.
+  if (cantidad < 0) avisarStockBajo([{ producto_id, cantidad: -cantidad }]);
+  return movimiento;
+}
+
+// Avisa al administrador de los productos que, con esta salida, pasaron a estar
+// en su stock mínimo (solo una vez, no en cada salida posterior). "cantidad" es
+// lo que se retiró. Se llama después del COMMIT y nunca lanza errores.
+async function avisarStockBajo(salidas) {
+  for (const { producto_id, cantidad } of salidas) {
+    try {
+      const producto = await productosRepository.obtenerPorId(producto_id);
+      if (!producto?.activo) continue;
+      const { stock, stock_minimo } = producto;
+      if (stock <= stock_minimo && stock + cantidad > stock_minimo) {
+        await correoService.enviarAlertaStock(producto);
+      }
+    } catch (error) {
+      console.warn('No se pudo revisar el stock mínimo:', error.message);
+    }
+  }
 }
 
 async function listarMovimientos(productoId, { pagina, limite }) {
@@ -83,4 +106,10 @@ async function registrarDevolucion(client, { producto_id, cantidad, referencia, 
   return stock;
 }
 
-module.exports = { ajustar, listarMovimientos, registrarSalida, registrarDevolucion };
+module.exports = {
+  ajustar,
+  listarMovimientos,
+  registrarSalida,
+  registrarDevolucion,
+  avisarStockBajo,
+};

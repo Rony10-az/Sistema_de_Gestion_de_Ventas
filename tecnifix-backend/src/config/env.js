@@ -22,6 +22,14 @@ const env = {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRES_IN || '1d',
   },
+  // Opcional: sin estos datos la API funciona, pero no envía correos.
+  correo: {
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT) || 587,
+    user: process.env.SMTP_USER,
+    password: process.env.SMTP_PASSWORD,
+    admin: process.env.CORREO_ADMIN,
+  },
 };
 
 // Detiene el arranque si falta algo indispensable. La llama server.js (no se
