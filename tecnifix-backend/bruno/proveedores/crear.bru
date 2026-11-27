@@ -1,0 +1,37 @@
+meta {
+  name: Crear proveedor
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/proveedores
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "ruc": "{{proveedorRuc}}",
+    "razon_social": "Proveedor Bruno",
+    "telefono": "900000000"
+  }
+}
+
+script:pre-request {
+  bru.setVar("proveedorRuc", "20" + String(Date.now()).slice(-9));
+}
+
+script:post-response {
+  bru.setVar("proveedorId", res.getBody().id);
+}
+
+tests {
+  test("responde 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

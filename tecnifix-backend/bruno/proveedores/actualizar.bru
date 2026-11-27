@@ -1,0 +1,29 @@
+meta {
+  name: Actualizar proveedor
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/proveedores/{{proveedorId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "ruc": "{{proveedorRuc}}",
+    "razon_social": "Proveedor Bruno editado",
+    "telefono": "900000000"
+  }
+}
+
+tests {
+  test("responde 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
