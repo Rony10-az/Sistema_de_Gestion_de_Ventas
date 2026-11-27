@@ -9,6 +9,33 @@ request → routes → controller → service → repository → PostgreSQL
 response ← controller ← ← ← ← ← ← ┘
 ```
 
+## Cómo correr
+
+```bash
+npm install
+npm run env:init          # crea .env; luego escribe tu DB_PASSWORD
+npm run db:setup          # crea la base, migra y carga datos de prueba
+npm run dev               # nodemon, recarga automática en http://localhost:4000
+```
+
+## Base de datos
+
+| Script | Qué hace |
+|---|---|
+| `npm run db:check` | Prueba la conexión. |
+| `npm run db:create` | Crea la base local (`DB_NAME`) si no existe. |
+| `npm run db:migrate` | Aplica las migraciones pendientes de `src/database/migrations`. |
+| `npm run db:seed` | Carga los datos pendientes de `src/database/seeds`. |
+| `npm run db:setup` | `create` + `migrate` + `seed`. |
+
+Cada integrante tiene su propia base local (PostgreSQL instalado o el de Docker, puerto
+5434). Lo aplicado se anota en la tabla `schema_migrations`, así que los comandos se
+pueden repetir sin duplicar. Un cambio en la base es un archivo nuevo numerado
+(`003_...sql` en adelante). Si ya tenías tablas creadas antes, usa otro `DB_NAME`.
+
+Usuarios de prueba (contraseña `tecnifix123`, solo local): `admin@tecnifix.pe`,
+`vendedor@tecnifix.pe` y `almacen@tecnifix.pe`.
+
 ## Capas
 
 | Carpeta | Qué hace | Qué NO hace |
@@ -18,7 +45,7 @@ response ← controller ← ← ← ← ← ← ┘
 | `services/` | Reglas de negocio: validaciones, cálculos, orquestar varias repositorios, hashear contraseñas, firmar JWT. | No conoce `req`/`res` de Express, no escribe SQL directo. |
 | `repositories/` | Única capa que sabe que la base de datos es PostgreSQL. Arma y ejecuta queries SQL con `pg`. | No valida reglas de negocio. |
 | `validators/` | Reglas de validación de los datos de cada módulo (`modulo.validator.js`). | No consulta la base de datos. |
-| `middlewares/` | Funciones que se ejecutan antes del controlador: verificar JWT, manejar errores, validar body. | — |
+| `middlewares/` | Funciones que se ejecutan antes del controlador: verificar JWT y rol, manejar errores. | — |
 | `utils/` | Helpers reutilizables sin estado (firmar/verificar JWT, formatear respuestas). | — |
 | `database/migrations` | Scripts SQL que crean/alteran tablas. | — |
 | `database/seeds` | Scripts SQL con datos de prueba. | — |
@@ -28,7 +55,8 @@ response ← controller ← ← ← ← ← ← ┘
 Las carpetas de capas van en inglés, los módulos en español y los archivos siguen la
 forma `modulo.capa.js` (ej. `productos.service.js`). Módulos previstos: `auth`,
 `usuarios`, `productos`, `categorias`, `proveedores`, `compras`, `inventario`,
-`clientes`, `ventas`, `pagos` y `reportes`. Faltan `usuarios`, `pagos` y `reportes`.
+`clientes`, `ventas`, `pagos` y `reportes`. Todavía no existen `usuarios`, `pagos` ni
+`reportes`.
 
 ## Dominios (módulos del negocio)
 
@@ -38,13 +66,13 @@ intencional: si un dominio crece mucho, se puede mover tal cual a su propio
 microservicio (ver el README raíz del proyecto, sección "Fase actual vs. arquitectura
 objetivo").
 
-- **auth** — registro, login, emisión/verificación de JWT, roles de usuario.
+- **auth** — registro, login y emisión/verificación de JWT.
 - **categorias** y **proveedores** — alta, edición y búsqueda.
 - **productos** — catálogo: alta, edición, desactivación, búsqueda y filtros.
 - **compras** — entrada de mercadería: sube el stock y anota el kardex.
 - **inventario** — ajustes de stock, kardex y alerta de stock mínimo.
 - **clientes** — datos de clientes que compran.
-- **ventas** — registro de pedidos/ventas, detalle de venta, reportes simples.
+- **ventas** — registro y consulta de ventas (cálculo y detalle pendientes).
 
 ## Rutas (sin prefijo `/api/`)
 
@@ -89,7 +117,7 @@ inventario: [`../docs/API.md`](../docs/API.md).
 
 ## Módulo de inventario
 
-Responsable: Jerónimo. Está programado, validado y probado.
+Responsable: Jerónimo. ✅ Programado, validado y probado.
 
 ### Qué hace
 
@@ -154,7 +182,7 @@ Se crean con `database/migrations/002_modelo_tecnifix.sql` (`npm run db:migrate`
 | `inventarioService.registrarDevolucion(client, datos)` | Devolver stock al anular una venta |
 | `inventarioService.avisarStockBajo(items)` | Pedir la alerta después del `COMMIT` |
 
-Ejemplo de uso en [`equipo-backend/README.md`](equipo-backend/README.md#cómo-usa-ventas-el-inventario).
+Ejemplo de uso en [`equipo-backend/README.md`](equipo-backend/README.md#7-cómo-usa-ventas-el-inventario).
 El módulo de ventas todavía no las usa.
 
 ### Correo (opcional)
@@ -171,37 +199,21 @@ la API funciona igual.
 
 Los cinco módulos tienen pruebas unitarias y de integración en `tests/`; el correo, unitarias.
 
-### Pendiente fuera de este módulo
+### Estado
 
-- Un error inesperado del servidor responde 400 (`error.middleware.js`).
-- Faltan las pantallas de categorías, proveedores, compras y kardex en el frontend.
-- El envío real de correo no está comprobado con un servidor SMTP: las pruebas lo simulan.
-- Con Docker, el backend no recibe las variables `SMTP_*` (faltan en `docker-compose.yml`).
+- [x] Categorías, proveedores y productos
+- [x] Compras, ajustes de stock y kardex
+- [x] Permisos por rol con `verificarRol`
+- [x] Funciones de stock para ventas
+- [x] Alerta de stock mínimo por correo (probada con envío simulado)
+- [x] Pruebas, colección de Bruno y contrato en `docs/API.md`
+- [ ] Probar el correo con un servidor SMTP real
+- [ ] Pasar las variables `SMTP_*` al backend en `docker-compose.yml`
 
-## Cómo correr
+Dependen de otras partes: que ventas use las funciones de stock y las pantallas de
+inventario en el frontend.
 
-```bash
-npm install
-npm run env:init          # crea .env; luego escribe tu DB_PASSWORD
-npm run db:setup          # crea la base, migra y carga datos de prueba
-npm run dev               # nodemon, recarga automática
-```
 
-## Base de datos
-
-| Script | Qué hace |
-|---|---|
-| `npm run db:check` | Prueba la conexión. |
-| `npm run db:create` | Crea la base local (`DB_NAME`) si no existe. |
-| `npm run db:migrate` | Aplica las migraciones pendientes de `src/database/migrations`. |
-| `npm run db:seed` | Carga los datos pendientes de `src/database/seeds`. |
-| `npm run db:setup` | `create` + `migrate` + `seed`. |
-
-Lo aplicado se anota en la tabla `schema_migrations`, así que se pueden repetir sin
-duplicar. Un cambio en la base es un archivo nuevo numerado (`002_...sql`). Si ya
-habías cargado `seed.sql` a mano, `db:seed` fallará por registros repetidos.
-
-Se usa PostgreSQL instalado en cada computadora; cada integrante tiene su propia base.
 
 ## Pruebas
 

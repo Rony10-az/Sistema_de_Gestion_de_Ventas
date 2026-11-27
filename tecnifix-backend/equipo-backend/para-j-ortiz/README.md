@@ -2,6 +2,8 @@
 
 Fecha: 27/11/2026. Commits en `main` hasta `419b508`.
 
+**Estado: atendida** (ver la sección 6).
+
 ## 1. Antes de seguir trabajando
 
 ```powershell
@@ -54,8 +56,8 @@ se recomienda un Pull Request.
 
 ## 5. Por revisar o coordinar
 
-- [ ] Confirma que la migración coincide con lo que esperan tus módulos.
-- [ ] Las ventas todavía no usan `registrarSalida` ni `registrarDevolucion`: avisa a quien
+- [x] Confirma que la migración coincide con lo que esperan tus módulos.
+- [x] Las ventas todavía no usan `registrarSalida` ni `registrarDevolucion`: avisa a quien
   las programe si cambias esas funciones.
 - [ ] La pantalla de productos del frontend aún espera una lista simple; la API responde
   `{ data, total, pagina, limite }`.
@@ -68,7 +70,7 @@ Si algo de esto no te cuadra, avisa antes de cambiarlo.
 |---|---|
 | La migración coincide con los módulos | Confirmado: `db:setup` en una base nueva y 215 pruebas en verde (7 `todo`) |
 | `verificarRol` en las rutas de inventario | Revisado: las pruebas pasan |
-| `registrarSalida` y `registrarDevolucion` | Sin cambios; ventas todavía no las usa. Ejemplo en la [guía](../README.md#cómo-usa-ventas-el-inventario) |
+| `registrarSalida` y `registrarDevolucion` | Sin cambios; ventas todavía no las usa. Ejemplo en la [guía](../README.md#7-cómo-usa-ventas-el-inventario) |
 | Pantalla de productos del frontend | Sigue esperando una lista simple: debe leer `data` de `{ data, total, pagina, limite }` |
 
 Para la base local se usan las migraciones con `npm run db:setup`.
