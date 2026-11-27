@@ -3,6 +3,43 @@
 Cómo poner a funcionar el proyecto y qué pasos seguir. No escribas aquí contraseñas,
 tokens ni datos personales: todo el que tenga acceso al repositorio puede leerlo.
 
+## Inventario: últimos cambios
+
+Cada integrante de backend trabaja con su base en su entorno local: no se comparten
+migraciones. Para usar los módulos de inventario, tu base necesita estas tablas.
+
+| Módulo | Rutas | Estado |
+|---|---|---|
+| Categorías | `GET` `POST /categorias` · `PUT /categorias/:id` | Código listo, sin registrar |
+| Proveedores | `GET` `POST /proveedores` · `PUT /proveedores/:id` | Código listo, sin registrar |
+| Productos | `GET` `POST /productos` · `GET` `PUT` `DELETE /productos/:id` | Actualizado |
+| Compras | `GET` `POST /compras` · `GET /compras/:id` | Código listo, sin registrar |
+| Ajustes, consulta de kardex y descuento de stock para ventas | — | Pendiente |
+| Alerta de stock mínimo por correo | — | Pendiente |
+
+| Tabla | Columnas |
+|---|---|
+| `categorias` | `id`, `nombre` (único) |
+| `proveedores` | `id`, `ruc` (único), `razon_social`, `telefono` |
+| `productos` | `id`, `sku` (único), `nombre`, `categoria_id`, `precio_compra`, `precio_venta`, `stock`, `stock_minimo`, `activo` |
+| `compras` | `id`, `proveedor_id`, `usuario_id`, `total`, `fecha` |
+| `compra_detalle` | `id`, `compra_id`, `producto_id`, `cantidad`, `costo_unitario` |
+| `movimientos_inventario` | `id`, `producto_id`, `tipo`, `cantidad`, `stock_resultante`, `referencia`, `motivo`, `usuario_id`, `fecha` |
+
+Qué cambia para el resto:
+- En `productos`, `precio` pasa a `precio_venta` y desaparece `descripcion`. Con las
+  tablas de `001_init.sql`, `/productos` falla.
+- Productos exige sesión y los listados devuelven `{ data, total, pagina, limite }`.
+- `DELETE /productos/:id` desactiva el producto, no lo borra.
+- Las pruebas de integración de productos y compras necesitan esas tablas.
+- Para registrar las rutas, en `src/routes/index.js`:
+
+```js
+router.use('/categorias', require('./categorias.routes'));
+router.use('/proveedores', require('./proveedores.routes'));
+router.use('/compras', require('./compras.routes'));
+```
+
 ## 1. Ponerlo a funcionar
 
 Requisitos: Node 22, PostgreSQL 17 (o Docker Desktop) y Git. Desde `tecnifix-backend/`:
