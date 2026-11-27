@@ -10,11 +10,12 @@ migraciones. Para usar los módulos de inventario, tu base necesita estas tablas
 
 | Módulo | Rutas | Estado |
 |---|---|---|
-| Categorías | `GET` `POST /categorias` · `PUT /categorias/:id` | Código listo, sin registrar |
-| Proveedores | `GET` `POST /proveedores` · `PUT /proveedores/:id` | Código listo, sin registrar |
+| Categorías | `GET` `POST /categorias` · `PUT /categorias/:id` | Listo |
+| Proveedores | `GET` `POST /proveedores` · `PUT /proveedores/:id` | Listo |
 | Productos | `GET` `POST /productos` · `GET` `PUT` `DELETE /productos/:id` | Actualizado |
-| Compras | `GET` `POST /compras` · `GET /compras/:id` | Código listo, sin registrar |
-| Ajustes, consulta de kardex y descuento de stock para ventas | — | Pendiente |
+| Compras | `GET` `POST /compras` · `GET /compras/:id` | Listo |
+| Ajustes y kardex | `POST /inventario/ajustes` · `GET /productos/:id/movimientos` | Listo |
+| Descuento y devolución de stock para ventas | Funciones en `inventario.service.js` | Listo |
 | Alerta de stock mínimo por correo | — | Pendiente |
 
 | Tabla | Columnas |
@@ -32,13 +33,32 @@ Qué cambia para el resto:
 - Productos exige sesión y los listados devuelven `{ data, total, pagina, limite }`.
 - `DELETE /productos/:id` desactiva el producto, no lo borra.
 - Las pruebas de integración de productos y compras necesitan esas tablas.
-- Para registrar las rutas, en `src/routes/index.js`:
+
+### Cómo usa ventas el inventario
+
+No se edita `productos.repository.js`: se llaman estas funciones dentro de la
+transacción de la venta, con los productos ordenados por id.
 
 ```js
-router.use('/categorias', require('./categorias.routes'));
-router.use('/proveedores', require('./proveedores.routes'));
-router.use('/compras', require('./compras.routes'));
+const { enTransaccion } = require('../repositories/inventario.repository');
+const productosRepository = require('../repositories/productos.repository');
+const inventarioService = require('./inventario.service');
+
+await enTransaccion(async (client) => {
+  // Bloquea los productos y devuelve precio_venta, stock y activo.
+  const productos = await productosRepository.bloquearPorIds(client, ids);
+  // ...insertar la venta y su detalle con el mismo client...
+  for (const { producto_id, cantidad } of itemsOrdenados) {
+    // Sin stock lanza un error 409 y se deshace toda la transacción.
+    await inventarioService.registrarSalida(client, {
+      producto_id, cantidad, referencia: `venta:${serieNumero}`, usuario_id,
+    });
+  }
+});
 ```
+
+Al anular una venta se usa `registrarDevolucion`, con los mismos datos. En el kardex la
+cantidad lleva signo: positiva si el stock sube y negativa si baja.
 
 ## 1. Ponerlo a funcionar
 
