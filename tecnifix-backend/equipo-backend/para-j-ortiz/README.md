@@ -61,3 +61,14 @@ se recomienda un Pull Request.
   `{ data, total, pagina, limite }`.
 
 Si algo de esto no te cuadra, avisa antes de cambiarlo.
+
+## 6. Respuesta de inventario (27/11/2026)
+
+| Punto | Resultado |
+|---|---|
+| La migración coincide con los módulos | Confirmado: `db:setup` en una base nueva y 215 pruebas en verde (7 `todo`) |
+| `verificarRol` en las rutas de inventario | Revisado: las pruebas pasan |
+| `registrarSalida` y `registrarDevolucion` | Sin cambios; ventas todavía no las usa. Ejemplo en la [guía](../README.md#cómo-usa-ventas-el-inventario) |
+| Pantalla de productos del frontend | Sigue esperando una lista simple: debe leer `data` de `{ data, total, pagina, limite }` |
+
+Para la base local se usan las migraciones con `npm run db:setup`.
