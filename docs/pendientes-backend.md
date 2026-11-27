@@ -14,6 +14,8 @@ Cómo se usa este archivo:
 
 ## 1. Login: responder 401 con clave incorrecta · pendiente
 
+> **Respuesta de backend** (guía de backend, sección 7): pasará a 401.
+
 **Hoy:** con correo o contraseña incorrectos, `auth.service.js` lanza un error sin `status` y el manejador central responde **400**.
 
 **Qué necesita el frontend:** **401** con `{ "error": "Correo o contraseña incorrectos" }`, y **423** cuando la cuenta está
@@ -48,6 +50,8 @@ Los datos de prueba del frontend usan exactamente estos nombres de campos.
 
 ## 4. Ajustes de stock: dónde va el motivo · por decidir
 
+> **Respuesta de backend:** propone la columna `motivo` en `movimientos_inventario`. El frontend está de acuerdo.
+
 **Qué muestra el frontend:** en el detalle del producto, el admin ajusta el stock con una cantidad (positiva o negativa) y un
 **motivo** obligatorio (por ejemplo "conteo físico").
 
@@ -55,6 +59,9 @@ Los datos de prueba del frontend usan exactamente estos nombres de campos.
 `movimientos_inventario` (hoy el modelo solo tiene `referencia`). Propuesta: agregar la columna `motivo`.
 
 ## 5. Caja: orden de las llamadas al cobrar · por decidir
+
+> **Respuesta de backend:** `/pagos/simular` solo aprueba o rechaza; `POST /ventas` recibe `metodo_pago` y guarda la venta y el pago
+> juntos. El frontend puede trabajar así: falta confirmarlo entre los dos y anotarlo en `docs/API.md`.
 
 **Qué muestra el frontend:** el vendedor arma el carrito, elige cliente, boleta o factura y método de pago, y pulsa "Cobrar".
 
