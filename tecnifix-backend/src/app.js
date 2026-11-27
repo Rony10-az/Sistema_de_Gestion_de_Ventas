@@ -4,11 +4,17 @@
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
 const env = require('./config/env');
 const routes = require('./routes');
 const errorMiddleware = require('./middlewares/error.middleware');
 
 const app = express();
+
+// Cabeceras de seguridad y registro de peticiones (silenciado en pruebas).
+app.use(helmet());
+if (env.nodeEnv !== 'test') app.use(morgan('dev'));
 
 // CORS: solo el origen configurado (el frontend Next.js) puede consumir la API.
 app.use(cors({ origin: env.corsOrigin }));
