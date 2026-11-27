@@ -9,6 +9,22 @@ describe('ventas.service', () => {
     await expect(service.obtenerPorId(999)).rejects.toThrow('Venta no encontrada');
   });
 
+  test('el admin lista todas las ventas y el vendedor solo las suyas', async () => {
+    repository.obtenerTodas.mockResolvedValue([]);
+    await service.listar({ id: 1, rol: 'admin' });
+    await service.listar({ id: 7, rol: 'vendedor' });
+    expect(repository.obtenerTodas.mock.calls).toEqual([[{}], [{ vendedorId: 7 }]]);
+  });
+
+  test('un vendedor no puede ver la venta de otro', async () => {
+    repository.obtenerPorId.mockResolvedValue({ id: 4, vendedor_id: 8 });
+    await expect(service.obtenerPorId(4, { id: 7, rol: 'vendedor' })).rejects.toMatchObject({
+      status: 404,
+    });
+    await expect(service.obtenerPorId(4, { id: 8, rol: 'vendedor' })).resolves.toMatchObject({ id: 4 });
+    await expect(service.obtenerPorId(4, { id: 1, rol: 'admin' })).resolves.toMatchObject({ id: 4 });
+  });
+
   test('crear registra como vendedor al usuario autenticado', async () => {
     repository.crear.mockResolvedValue({ id: 1 });
     await service.crear({ clienteId: 2, items: [] }, { id: 7 });

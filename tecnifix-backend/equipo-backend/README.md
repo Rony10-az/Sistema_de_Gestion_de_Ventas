@@ -166,7 +166,7 @@ En este orden, porque cada uno se apoya en el anterior:
 | 1 | Escribir el contrato en `docs/API.md` | Backend y frontend lo aprueban |
 | 2 | ~~Migración `002` según `docs/modelo-er.png`~~ (hecha) | `npm run db:setup` crea las 11 tablas |
 | 3 | Un usuario de prueba por rol y adaptar productos (`precio` → `precio_venta`) | Pruebas y Bruno en verde |
-| 4 | `verificarRol`, usuarios solo para admin y quitar `/auth/register` | Sin permiso responde 403 |
+| 4 | ~~`verificarRol`~~ (hecho). Falta: usuarios solo para admin y quitar `/auth/register` | Sin permiso responde 403 |
 | 5 | Errores 404/409, validación con `zod` y paginación | Todas las rutas usan el formato |
 | 6 | Categorías, proveedores y productos completos | Se registran desde la API |
 | 7 | Compras, ajustes y kardex, en transacción | Una compra sube el stock |

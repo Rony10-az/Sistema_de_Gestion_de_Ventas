@@ -6,14 +6,20 @@
 const ventasRepository = require('../repositories/ventas.repository');
 const productosRepository = require('../repositories/productos.repository');
 
-async function listar() {
-  return ventasRepository.obtenerTodas();
+// El vendedor solo ve sus propias ventas; el admin, todas.
+const soloPropias = (usuario) => usuario?.rol === 'vendedor';
+
+async function listar(usuario) {
+  return ventasRepository.obtenerTodas(soloPropias(usuario) ? { vendedorId: usuario.id } : {});
 }
 
-async function obtenerPorId(id) {
+// Una venta ajena responde igual que una que no existe.
+async function obtenerPorId(id, usuario) {
   const venta = await ventasRepository.obtenerPorId(id);
-  if (!venta) {
-    throw new Error('Venta no encontrada');
+  if (!venta || (soloPropias(usuario) && venta.vendedor_id !== usuario.id)) {
+    const error = new Error('Venta no encontrada');
+    error.status = 404;
+    throw error;
   }
   return venta;
 }

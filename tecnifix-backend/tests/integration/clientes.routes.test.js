@@ -34,5 +34,4 @@ describe('rutas de clientes', () => {
   });
 
   test.todo('responde 404 si no existe (hoy responde 400)');
-  test.todo('comprueba el rol del usuario');
 });

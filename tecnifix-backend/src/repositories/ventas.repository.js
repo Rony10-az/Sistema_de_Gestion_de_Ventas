@@ -4,8 +4,12 @@
 
 const pool = require('../config/database');
 
-async function obtenerTodas() {
-  const { rows } = await pool.query('SELECT * FROM ventas ORDER BY id DESC');
+// Con vendedorId devuelve solo las ventas de ese usuario.
+async function obtenerTodas({ vendedorId } = {}) {
+  const { rows } = await pool.query(
+    'SELECT * FROM ventas WHERE $1::int IS NULL OR vendedor_id = $1 ORDER BY id DESC',
+    [vendedorId ?? null]
+  );
   return rows;
 }
 

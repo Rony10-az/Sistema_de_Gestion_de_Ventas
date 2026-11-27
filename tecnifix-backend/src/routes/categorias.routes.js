@@ -4,21 +4,14 @@
 const { Router } = require('express');
 const categoriasController = require('../controllers/categorias.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
+const verificarRol = require('../middlewares/rol.middleware');
 const {
   validarCategoria,
   validarId,
   validarConsulta,
 } = require('../validators/categorias.validator');
 
-// TODO: reemplazar por el middleware verificarRol cuando esté en middlewares/.
-const soloRoles = (...roles) => (req, res, next) => {
-  if (!roles.includes(req.usuario.rol)) {
-    return res.status(403).json({ error: 'Tu rol no tiene permiso para esta acción' });
-  }
-  return next();
-};
-
-const puedeEditar = soloRoles('admin', 'almacenero');
+const puedeEditar = verificarRol('admin', 'almacenero');
 
 const router = Router();
 

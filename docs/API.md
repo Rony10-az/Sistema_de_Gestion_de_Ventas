@@ -35,6 +35,22 @@ las suyas.
 
 Hoy un fallo inesperado del servidor también responde 400.
 
+## Permisos por rol
+
+Todas las rutas, salvo `/auth/login` y `/auth/register`, exigen sesión. Sin sesión
+responden 401 y con un rol no permitido, 403.
+
+| Rutas | Admin | Vendedor | Almacenero |
+|---|:-:|:-:|:-:|
+| Clientes: `GET`, `POST`, `PUT` | ✓ | ✓ | — |
+| Clientes: `DELETE` | ✓ | — | — |
+| Ventas: `GET`, `POST` | ✓ todas | ✓ solo las suyas | — |
+
+El vendedor recibe 404 al pedir una venta de otro usuario. Los permisos de inventario
+están en la sección siguiente.
+
+En el backend se aplica con `verificarRol`, después de `authMiddleware`.
+
 ---
 
 # Inventario

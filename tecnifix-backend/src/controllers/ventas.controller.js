@@ -5,7 +5,7 @@ const ventasService = require('../services/ventas.service');
 
 async function listar(req, res, next) {
   try {
-    const ventas = await ventasService.listar();
+    const ventas = await ventasService.listar(req.usuario);
     res.json(ventas);
   } catch (error) {
     next(error);
@@ -14,7 +14,7 @@ async function listar(req, res, next) {
 
 async function obtenerPorId(req, res, next) {
   try {
-    const venta = await ventasService.obtenerPorId(req.params.id);
+    const venta = await ventasService.obtenerPorId(req.params.id, req.usuario);
     res.json(venta);
   } catch (error) {
     next(error);
