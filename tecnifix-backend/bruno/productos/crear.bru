@@ -1,0 +1,34 @@
+meta {
+  name: Crear producto
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/productos
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "nombre": "Producto Bruno",
+    "descripcion": "Prueba",
+    "precio": 25.5,
+    "stock": 5
+  }
+}
+
+script:post-response {
+  bru.setVar("productoId", res.getBody().id);
+}
+
+tests {
+  test("responde 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

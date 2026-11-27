@@ -96,6 +96,10 @@ Se usa PostgreSQL instalado en cada computadora; cada integrante tiene su propia
 
 ```bash
 npm run test:unit          # no necesita base de datos
-npm run test:integration   # necesita la base migrada
+npm run test:integration   # prepara y usa la base tecnifix_test
 npm test                   # todas
+npm run test:coverage      # todas, con cobertura
 ```
+
+Detalle en `tests/README.md`. Las peticiones HTTP para probar a mano están en
+`bruno/` (colección de Bruno).

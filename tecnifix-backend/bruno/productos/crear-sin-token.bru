@@ -1,0 +1,26 @@
+meta {
+  name: Crear sin sesion
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/productos
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "nombre": "Producto Bruno",
+    "descripcion": "Prueba",
+    "precio": 25.5,
+    "stock": 1
+  }
+}
+
+tests {
+  test("responde 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

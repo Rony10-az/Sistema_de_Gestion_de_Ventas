@@ -1,0 +1,32 @@
+meta {
+  name: Crear venta
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/ventas
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "clienteId": 1,
+    "items": []
+  }
+}
+
+script:post-response {
+  bru.setVar("ventaId", res.getBody().id);
+}
+
+tests {
+  test("responde 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

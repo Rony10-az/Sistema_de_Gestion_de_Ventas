@@ -1,0 +1,38 @@
+meta {
+  name: Crear cliente
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/clientes
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "nombre": "Cliente Bruno",
+    "email": "cliente.bruno@example.com",
+    "telefono": "900000000",
+    "documento": "{{documento}}"
+  }
+}
+
+script:pre-request {
+  bru.setVar("documento", "B" + Date.now());
+}
+
+script:post-response {
+  bru.setVar("clienteId", res.getBody().id);
+}
+
+tests {
+  test("responde 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

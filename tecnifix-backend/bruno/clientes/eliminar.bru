@@ -1,0 +1,21 @@
+meta {
+  name: Eliminar cliente
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/clientes/{{clienteId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("responde 204", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}

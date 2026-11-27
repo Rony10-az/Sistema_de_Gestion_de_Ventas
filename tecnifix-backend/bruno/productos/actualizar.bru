@@ -1,0 +1,30 @@
+meta {
+  name: Actualizar producto
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/productos/{{productoId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "nombre": "Producto Bruno",
+    "descripcion": "Prueba",
+    "precio": 25.5,
+    "stock": 8
+  }
+}
+
+tests {
+  test("responde 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

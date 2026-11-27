@@ -1,0 +1,30 @@
+meta {
+  name: Actualizar cliente
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/clientes/{{clienteId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "nombre": "Cliente Bruno",
+    "email": "cliente.bruno@example.com",
+    "telefono": "911111111",
+    "documento": "{{documento}}"
+  }
+}
+
+tests {
+  test("responde 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
