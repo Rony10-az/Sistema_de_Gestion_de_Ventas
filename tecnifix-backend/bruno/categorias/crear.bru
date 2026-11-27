@@ -1,0 +1,35 @@
+meta {
+  name: Crear categoría
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/categorias
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "nombre": "{{categoriaNombre}}"
+  }
+}
+
+script:pre-request {
+  bru.setVar("categoriaNombre", "Categoria " + Date.now());
+}
+
+script:post-response {
+  bru.setVar("categoriaId", res.getBody().id);
+}
+
+tests {
+  test("responde 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

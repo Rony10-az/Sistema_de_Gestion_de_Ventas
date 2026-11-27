@@ -1,0 +1,21 @@
+meta {
+  name: Listar categorías
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/categorias?pagina=1&limite=10
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("responde 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
