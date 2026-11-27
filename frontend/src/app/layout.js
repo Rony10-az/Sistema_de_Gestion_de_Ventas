@@ -4,7 +4,7 @@
 import { AuthProvider } from '../context/AuthContext';
 
 export const metadata = {
-  title: 'Sistema de Ventas',
+  title: 'TecniFix',
   description: 'Gestión de productos, clientes y ventas',
 };
 

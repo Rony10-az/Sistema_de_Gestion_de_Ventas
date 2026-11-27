@@ -1,7 +1,7 @@
 {
-  "name": "sistema-ventas-backend",
+  "name": "tecnifix-backend",
   "version": "1.0.0",
-  "description": "API REST del sistema de ventas (Express + PostgreSQL + JWT)",
+  "description": "API REST de TecniFix, ventas e inventario (Express + PostgreSQL + JWT)",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

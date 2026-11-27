@@ -1,8 +1,8 @@
-# Sistema de Gestión de Ventas
+# TecniFix · Sistema de gestión de ventas e inventario
 
 Proyecto del curso **Desarrollo de Aplicaciones Web Avanzado** (5to ciclo, Tecsup, 2026-2).
 
-Sistema de ventas con backend en **Express** (API REST en capas: rutas → controladores →
+TecniFix: sistema de ventas e inventario para una tienda de repuestos y accesorios, con backend en **Express** (API REST en capas: rutas → controladores →
 servicios → repositorios) y frontend en **Next.js**. Base de datos **PostgreSQL**.
 Seguridad con **JWT** (autenticación) y **CORS** (control de origen), pensada para
 seguir escalando (rate limiting, roles más finos, etc. se añaden sobre esta misma base).
@@ -27,7 +27,7 @@ productos, clientes, ventas). Se eligió así porque:
 ## Estructura del repositorio
 
 ```
-sistema-ventas/
+Sistema_de_Gestion_de_Ventas/
 ├── backend/     → API REST con Express (ver backend/README.md)
 └── frontend/    → Interfaz con Next.js (ver frontend/README.md)
 ```
@@ -57,13 +57,13 @@ El frontend consume esas mismas rutas vía `NEXT_PUBLIC_API_URL` (ver `frontend/
 
 ```bash
 # Backend
-cd sistema-ventas/backend
+cd Sistema_de_Gestion_de_Ventas/backend
 cp .env.example .env
 npm install
 npm run dev
 
 # Frontend (en otra terminal)
-cd sistema-ventas/frontend
+cd Sistema_de_Gestion_de_Ventas/frontend
 cp .env.example .env
 npm install
 npm run dev

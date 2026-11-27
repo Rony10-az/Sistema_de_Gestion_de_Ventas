@@ -4,7 +4,7 @@
 export default function HomePage() {
   return (
     <main>
-      <h1>Sistema de Ventas</h1>
+      <h1>TecniFix</h1>
       {/* TODO: redirigir según useAuth().usuario a /dashboard o /login */}
     </main>
   );

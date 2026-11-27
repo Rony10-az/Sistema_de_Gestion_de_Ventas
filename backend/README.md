@@ -1,4 +1,4 @@
-# Backend — Sistema de Ventas (Express + PostgreSQL)
+# Backend — TecniFix (Express + PostgreSQL)
 
 API REST en capas. Cada carpeta de `src/` tiene una responsabilidad única; una petición
 fluye siempre en el mismo sentido:
