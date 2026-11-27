@@ -12,4 +12,7 @@ const pool = new Pool({
   password: env.db.password,
 });
 
+// Sin este manejador, un corte en una conexión inactiva tumba el proceso.
+pool.on('error', (error) => console.error('Error en PostgreSQL:', error.message));
+
 module.exports = pool;

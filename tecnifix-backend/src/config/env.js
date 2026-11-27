@@ -4,10 +4,13 @@
 
 require('dotenv').config();
 
-module.exports = {
+const env = {
   port: process.env.PORT || 4000,
   nodeEnv: process.env.NODE_ENV || 'development',
-  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  // Uno o varios orígenes separados por coma.
+  corsOrigin: (process.env.CORS_ORIGIN || 'http://localhost:3000')
+    .split(',')
+    .map((origen) => origen.trim()),
   db: {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
@@ -20,3 +23,16 @@ module.exports = {
     expiresIn: process.env.JWT_EXPIRES_IN || '1d',
   },
 };
+
+// Detiene el arranque si falta algo indispensable. La llama server.js (no se
+// ejecuta al importar, para que las pruebas unitarias no necesiten .env).
+env.validar = () => {
+  const requeridas = ['JWT_SECRET', 'DB_HOST', 'DB_NAME', 'DB_USER'];
+
+  const faltan = requeridas.filter((nombre) => !process.env[nombre]);
+  if (faltan.length) {
+    throw new Error(`Faltan variables de entorno: ${faltan.join(', ')}. Revisa tu .env`);
+  }
+};
+
+module.exports = env;
