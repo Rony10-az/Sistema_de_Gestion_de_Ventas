@@ -3,7 +3,9 @@
 
 const { Router } = require('express');
 const productosController = require('../controllers/productos.controller');
+const inventarioController = require('../controllers/inventario.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
+const inventarioValidator = require('../validators/inventario.validator');
 const {
   validarProductoNuevo,
   validarProductoEditado,
@@ -27,6 +29,13 @@ router.use(authMiddleware);
 
 router.get('/', validarConsulta, productosController.listar);
 router.get('/:id', validarId, productosController.obtenerPorId);
+router.get(
+  '/:id/movimientos',
+  puedeEditar,
+  inventarioValidator.validarId,
+  inventarioValidator.validarConsulta,
+  inventarioController.listarMovimientos
+);
 router.post('/', puedeEditar, validarProductoNuevo, productosController.crear);
 router.put('/:id', puedeEditar, validarId, validarProductoEditado, productosController.actualizar);
 router.delete('/:id', puedeEditar, validarId, productosController.desactivar);

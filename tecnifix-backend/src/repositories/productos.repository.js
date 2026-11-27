@@ -92,7 +92,43 @@ async function sumarStock(client, id, cantidad) {
   return rows[0]?.stock;
 }
 
+// Ajuste manual (positivo o negativo). Devuelve undefined si dejaría el stock
+// en negativo. También vale para productos desactivados.
+async function ajustarStock(client, id, cantidad) {
+  const { rows } = await client.query(
+    'UPDATE productos SET stock = stock + $2 WHERE id = $1 AND stock + $2 >= 0 RETURNING stock',
+    [id, cantidad]
+  );
+  return rows[0]?.stock;
+}
+
+// ---- Funciones para ventas. Todas usan la transacción de quien llama. ----
+
+// Bloquea los productos hasta el COMMIT y entrega precio y stock actuales.
+// Se bloquean por id para que dos ventas no se queden esperando una a la otra.
+async function bloquearPorIds(client, ids) {
+  const { rows } = await client.query(
+    `SELECT id, sku, nombre, precio_venta::float8 AS precio_venta, stock, activo
+     FROM productos WHERE id = ANY($1::int[]) ORDER BY id FOR UPDATE`,
+    [ids]
+  );
+  return rows;
+}
+
+// Devuelve undefined si no alcanza el stock o el producto está desactivado.
+async function descontarStock(client, id, cantidad) {
+  const { rows } = await client.query(
+    `UPDATE productos SET stock = stock - $2
+     WHERE id = $1 AND activo AND stock >= $2 RETURNING stock`,
+    [id, cantidad]
+  );
+  return rows[0]?.stock;
+}
+
 module.exports = {
+  ajustarStock,
+  bloquearPorIds,
+  descontarStock,
   listar,
   obtenerPorId,
   obtenerPorSku,

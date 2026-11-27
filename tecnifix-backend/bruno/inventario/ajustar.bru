@@ -1,0 +1,29 @@
+meta {
+  name: Ajustar stock
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/inventario/ajustes
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "producto_id": 1,
+    "cantidad": 1,
+    "motivo": "Conteo físico"
+  }
+}
+
+tests {
+  test("responde 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}
