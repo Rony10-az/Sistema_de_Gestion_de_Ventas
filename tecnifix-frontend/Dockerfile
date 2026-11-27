@@ -10,6 +10,8 @@ COPY . .
 # Next.js fija las variables NEXT_PUBLIC_* al compilar.
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_USE_MOCKS=false
+ENV NEXT_PUBLIC_USE_MOCKS=$NEXT_PUBLIC_USE_MOCKS
 RUN npm run build && chown -R node:node .next
 
 ENV NODE_ENV=production

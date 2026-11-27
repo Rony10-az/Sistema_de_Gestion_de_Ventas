@@ -88,6 +88,8 @@ docker compose up --build
 El backend aplica las migraciones y datos de prueba al arrancar. La base de Docker es
 distinta a la de tu PostgreSQL instalado y se conserva en el volumen `datos_db`.
 
+- El frontend usa la API real. Para los datos de prueba: `NEXT_PUBLIC_USE_MOCKS=true`
+  en `.env` y `docker compose up --build`.
 - Detener: `docker compose down`
 - Borrar también los datos: `docker compose down -v`
 - Solo la base (para correr el código con `npm run dev`): `docker compose up -d db`, y en
