@@ -5,6 +5,8 @@ tokens ni datos personales: todo el que tenga acceso al repositorio puede leerlo
 
 ## Aviso para quien lleva inventario (27/11/2026)
 
+Detalle completo en [para-j-ortiz/README.md](para-j-ortiz/README.md).
+
 Se modificaron archivos del módulo de inventario. **Antes de seguir, ejecuta**
 `git pull origin main`, `npm install` y `npm run db:setup`.
 
