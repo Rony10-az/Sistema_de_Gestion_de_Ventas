@@ -3,6 +3,26 @@
 Cómo poner a funcionar el proyecto y qué pasos seguir. No escribas aquí contraseñas,
 tokens ni datos personales: todo el que tenga acceso al repositorio puede leerlo.
 
+## Aviso para quien lleva inventario (27/11/2026)
+
+Se modificaron archivos del módulo de inventario. **Antes de seguir, ejecuta**
+`git pull origin main`, `npm install` y `npm run db:setup`.
+
+| Archivo | Qué se hizo |
+|---|---|
+| `src/routes/productos.routes.js`, `categorias.routes.js`, `proveedores.routes.js`, `compras.routes.js`, `inventario.routes.js` | Se quitó la función provisional `soloRoles` y ahora usan `verificarRol` (`src/middlewares/rol.middleware.js`). Los permisos y mensajes son los mismos |
+| `docs/API.md` | Sección nueva "Permisos por rol" (clientes y ventas) |
+| Esta guía | Notas sobre la migración y los roles |
+
+Además:
+- Las tablas del modelo ya están en `src/database/migrations/002_modelo_tecnifix.sql`. Si
+  creaste tablas a mano, prueba con una base nueva (cambia `DB_NAME` en tu `.env`).
+- Bruno ahora inicia sesión con `admin@tecnifix.pe` (datos de prueba).
+- En rutas nuevas, usa `verificarRol('admin', ...)` después de `authMiddleware`.
+
+Se trabaja directamente en `main`: haz `git pull --rebase origin main` antes de empezar
+y antes de cada push.
+
 ## Inventario: últimos cambios
 
 Cada integrante de backend trabaja con su base en su entorno local, y todos la crean
@@ -117,11 +137,11 @@ Nombres: `modulo.capa.js` (ej. `ventas.service.js`).
 ## 3. Cómo agregar una funcionalidad
 
 1. Anotar la ruta en `docs/API.md`: qué recibe, qué responde y qué roles la usan.
-2. Crear una rama desde `main` actualizado: `back/nombre-corto`.
+2. Actualizar `main`: `git pull --rebase origin main`.
 3. Escribir en este orden: `repository` → `service` → `validator` → `controller` → `routes`.
 4. Registrar el router nuevo en `src/routes/index.js`.
 5. Añadir pruebas en `tests/` y las peticiones en `bruno/`.
-6. `npm test`, `git pull --rebase origin main` y Pull Request.
+6. `npm test`, commit, `git pull --rebase origin main` y push a `main`.
 
 Está terminada cuando valida los datos, comprueba el rol, responde con el formato
 acordado, tiene pruebas y está documentada.
@@ -189,8 +209,8 @@ Salen de `docs/frontend-vistas.md`. Son **propuestas**, todavía sin acordar.
 ## 8. Recomendaciones para un mejor funcionamiento
 
 - Completar pronto un flujo corto de punta a punta: login → producto → venta → stock.
-- Ejecutar las pruebas con GitHub Actions en cada Pull Request.
-- Proteger `main` con Pull Request obligatorio.
+- Ejecutar las pruebas con GitHub Actions en cada push a `main`.
+- No subir a `main` con pruebas fallando: ejecutar `npm test` antes de cada push.
 - Integrar seguido con frontend, apagando los datos de prueba módulo por módulo.
 - Confirmar con el docente el despliegue: la rúbrica pide la nube y hoy la base es local.
 - Dejar los extras (como el correo de stock mínimo) para el final, salvo que el curso los exija.
