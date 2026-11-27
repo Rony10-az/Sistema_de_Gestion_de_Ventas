@@ -3,8 +3,8 @@
 // Página /clientes: lista y gestiona clientes (requiere sesión).
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import { listarClientes } from '../../services/clientes.service';
+import { useAuth } from '../../../hooks/useAuth';
+import { listarClientes } from '../../../services/clientes.service';
 
 export default function ClientesPage() {
   const { token } = useAuth();

@@ -4,8 +4,8 @@
 // y listar el historial de ventas (requiere sesión).
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import { listarVentas } from '../../services/ventas.service';
+import { useAuth } from '../../../hooks/useAuth';
+import { listarVentas } from '../../../services/ventas.service';
 
 export default function VentasPage() {
   const { token } = useAuth();

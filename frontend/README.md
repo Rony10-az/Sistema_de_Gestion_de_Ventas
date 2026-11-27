@@ -8,6 +8,10 @@ Interfaz web que consume la API del backend (`sistema-ventas/backend`). Usa el
 | Carpeta | Qué va aquí |
 |---|---|
 | `src/app/` | Páginas y rutas de la aplicación (una carpeta = una ruta). |
+| `src/app/(publico)/` | Páginas sin sesión (login). El paréntesis no aparece en la URL. |
+| `src/app/(panel)/` | Páginas internas. Aquí irá el layout con menú y protección (pendiente). |
+| `src/components/inventario/`, `clientes/`, `ventas/`, `dashboard/` | Componentes propios de cada módulo, en `PascalCase`. |
+| `src/mocks/` | Datos de prueba mientras el backend no esté listo (`modulo.mock.js`). |
 | `src/components/ui/` | Componentes visuales reutilizables y genéricos (botones, inputs, tablas, modales). Sin lógica de negocio. |
 | `src/components/layout/` | Estructura compartida de página: navbar, sidebar, layout del dashboard. |
 | `src/services/` | Funciones que llaman a la API del backend (fetch). Un archivo por dominio, espejo de las rutas del backend. |
@@ -26,6 +30,9 @@ Interfaz web que consume la API del backend (`sistema-ventas/backend`). Usa el
 /clientes         → listado y gestión de clientes
 /ventas           → registrar y listar ventas
 ```
+
+Carpetas creadas pero aún sin página: `usuarios`, `categorias`, `proveedores`,
+`compras` y `reportes`.
 
 ## Cómo correr
 

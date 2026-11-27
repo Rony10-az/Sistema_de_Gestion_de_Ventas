@@ -4,7 +4,7 @@
 // crear/editar/eliminar productos (reservado a usuarios autenticados).
 
 import { useEffect, useState } from 'react';
-import { listarProductos } from '../../services/productos.service';
+import { listarProductos } from '../../../services/productos.service';
 
 export default function ProductosPage() {
   const [productos, setProductos] = useState([]);
