@@ -252,3 +252,72 @@ Errores: 400, 401, 403, 404, 409 (el stock quedaría en negativo).
 
 Si una salida o un ajuste deja un producto en su stock mínimo, se avisa por correo al
 administrador.
+
+---
+
+# Clientes
+
+| Método | Ruta | Admin | Vendedor | Almacenero |
+|---|---|:-:|:-:|:-:|
+| GET | `/clientes`, `/clientes/:id` | ✓ | ✓ | — |
+| GET | `/clientes/:id/ventas` | ✓ todas | ✓ solo las suyas | — |
+| POST, PUT | `/clientes`, `/clientes/:id` | ✓ | ✓ | — |
+| DELETE | `/clientes/:id` | ✓ | — | — |
+
+`GET /clientes?buscar=&pagina=&limite=` busca por documento o nombre, sin distinguir
+mayúsculas. Cada elemento:
+
+```json
+{
+  "id": 1,
+  "tipo_documento": "DNI",
+  "documento": "12345678",
+  "nombre": "Ana Pérez",
+  "telefono": "987654321",
+  "email": "ana@example.com",
+  "direccion": "Av. Lima 123"
+}
+```
+
+`telefono`, `email` y `direccion` valen `null` si no se enviaron.
+
+`POST /clientes` (201) y `PUT /clientes/:id` (200) reciben y devuelven el cliente. `PUT`
+reemplaza todos los campos. `GET /clientes/:id` responde 200 con el cliente.
+`DELETE /clientes/:id` responde 204 sin cuerpo.
+
+| Campo | Regla |
+|---|---|
+| `tipo_documento` | Obligatorio: `DNI` o `RUC` |
+| `documento` | Obligatorio y único. DNI: 8 dígitos; RUC: 11 dígitos |
+| `nombre` | Obligatorio, de 3 a 150 caracteres |
+| `telefono` | Opcional, 9 dígitos y empieza con 9 |
+| `email` | Opcional, con formato de correo (hasta 150 caracteres) |
+| `direccion` | Opcional (hasta 200 caracteres), pero obligatoria si el tipo es `RUC` |
+
+Un campo opcional enviado vacío (`""`) se guarda como `null`.
+
+```json
+{ "error": "Datos inválidos", "campos": { "documento": "El DNI debe tener 8 dígitos" } }
+```
+
+## Ventas de un cliente
+
+`GET /clientes/:id/ventas?pagina=&limite=` lista las ventas del cliente, de la más
+reciente a la más antigua. El administrador ve todas; el vendedor, solo las que él
+registró. Cada elemento:
+
+```json
+{
+  "id": 12,
+  "serie_numero": "B001-00000012",
+  "tipo_comprobante": "boleta",
+  "total": 118,
+  "estado": "pagada",
+  "fecha": "2026-11-28T15:30:00.000Z"
+}
+```
+
+`serie_numero` es `null` mientras la venta no tenga numeración.
+
+Errores: 400 (datos o `id` inválidos), 401, 403 (el almacenero, o un vendedor al borrar),
+404 (cliente inexistente), 409 (documento repetido; al borrar, el cliente tiene ventas).

@@ -1,12 +1,11 @@
 // Controlador de "clientes": traduce HTTP <-> service.
-// Mismo patrón que productos.controller.js.
+// Los datos llegan ya validados en res.locals (ver clientes.validator.js).
 
 const clientesService = require('../services/clientes.service');
 
 async function listar(req, res, next) {
   try {
-    const clientes = await clientesService.listar();
-    res.json(clientes);
+    res.json(await clientesService.listar(res.locals.query));
   } catch (error) {
     next(error);
   }
@@ -14,8 +13,17 @@ async function listar(req, res, next) {
 
 async function obtenerPorId(req, res, next) {
   try {
-    const cliente = await clientesService.obtenerPorId(req.params.id);
-    res.json(cliente);
+    res.json(await clientesService.obtenerPorId(res.locals.params.id));
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function listarVentas(req, res, next) {
+  try {
+    res.json(
+      await clientesService.listarVentas(res.locals.params.id, req.usuario, res.locals.query)
+    );
   } catch (error) {
     next(error);
   }
@@ -23,8 +31,7 @@ async function obtenerPorId(req, res, next) {
 
 async function crear(req, res, next) {
   try {
-    const cliente = await clientesService.crear(req.body);
-    res.status(201).json(cliente);
+    res.status(201).json(await clientesService.crear(res.locals.body));
   } catch (error) {
     next(error);
   }
@@ -32,8 +39,7 @@ async function crear(req, res, next) {
 
 async function actualizar(req, res, next) {
   try {
-    const cliente = await clientesService.actualizar(req.params.id, req.body);
-    res.json(cliente);
+    res.json(await clientesService.actualizar(res.locals.params.id, res.locals.body));
   } catch (error) {
     next(error);
   }
@@ -41,11 +47,11 @@ async function actualizar(req, res, next) {
 
 async function eliminar(req, res, next) {
   try {
-    await clientesService.eliminar(req.params.id);
+    await clientesService.eliminar(res.locals.params.id);
     res.status(204).send();
   } catch (error) {
     next(error);
   }
 }
 
-module.exports = { listar, obtenerPorId, crear, actualizar, eliminar };
+module.exports = { listar, obtenerPorId, listarVentas, crear, actualizar, eliminar };

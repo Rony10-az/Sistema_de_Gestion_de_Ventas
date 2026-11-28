@@ -1,0 +1,33 @@
+meta {
+  name: Crear cliente con documento repetido
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/clientes
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "tipo_documento": "DNI",
+    "documento": "{{documento}}",
+    "nombre": "Cliente Repetido"
+  }
+}
+
+docs {
+  Ejecuta antes "Crear cliente": reutiliza su documento.
+}
+
+tests {
+  test("responde 409", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+}

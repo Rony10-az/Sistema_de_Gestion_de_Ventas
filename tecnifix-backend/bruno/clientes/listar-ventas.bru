@@ -1,0 +1,22 @@
+meta {
+  name: Ventas del cliente
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/clientes/{{clienteId}}/ventas?pagina=1&limite=10
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("responde 200 con el formato paginado", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.getBody()).to.have.all.keys("data", "total", "pagina", "limite");
+  });
+}

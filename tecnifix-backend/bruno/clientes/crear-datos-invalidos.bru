@@ -1,0 +1,32 @@
+meta {
+  name: Crear cliente con datos inválidos
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/clientes
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "tipo_documento": "RUC",
+    "documento": "123",
+    "nombre": "ab",
+    "telefono": "812345678"
+  }
+}
+
+tests {
+  test("responde 400 con los campos", function () {
+    expect(res.getStatus()).to.equal(400);
+    expect(res.getBody().error).to.equal("Datos inválidos");
+    expect(res.getBody().campos).to.include.keys("documento", "nombre", "telefono", "direccion");
+  });
+}

@@ -16,15 +16,17 @@ auth:bearer {
 
 body:json {
   {
+    "tipo_documento": "DNI",
+    "documento": "{{documento}}",
     "nombre": "Cliente Bruno",
-    "email": "cliente.bruno@example.com",
     "telefono": "900000000",
-    "documento": "{{documento}}"
+    "email": "cliente.bruno@example.com",
+    "direccion": "Av. Bruno 123"
   }
 }
 
 script:pre-request {
-  bru.setVar("documento", "B" + Date.now());
+  bru.setVar("documento", String(Date.now()).slice(-8));
 }
 
 script:post-response {
